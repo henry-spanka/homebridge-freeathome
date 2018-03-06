@@ -85,9 +85,19 @@ function BuschJaegerApPlatform(log, config) {
 
         if (that.accessoryCallbackSet) {
             that.transformAccessories(JSON.parse(data)['result']);
-            that.accessoryCallback(that.foundAccessories);
-            that.accessoryCallback = null;
-            that.accessoryCallbackSet = false;
+
+            /*
+            There may be an edge case where the connection to the SysAP Node Plugin
+            is established successfully but the SysAP Node Plugin can not authenticate against
+            the SysAP and therefore returns no accessories. This will remove all devices from the
+            HomeKit database.
+            */
+
+            if (that.foundAccessories.length > 1) {
+                that.accessoryCallback(that.foundAccessories);
+                that.accessoryCallback = null;
+                that.accessoryCallbackSet = false;
+            }
         }
     });
 
