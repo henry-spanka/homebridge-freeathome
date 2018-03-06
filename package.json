@@ -10,16 +10,17 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git://github.com/example/homebridge.git"
+        "url": "git://github.com/henry-spanka/homebridge-buschjaeger.git"
     },
     "bugs": {
-        "url": "http://github.com/example/homebridge/issues"
+        "url": "https://github.com/henry-spanka/homebridge-buschjaeger/issues"
     },
     "engines": {
         "node": ">=0.12.0",
         "homebridge": ">=0.2.0"
     },
     "dependencies": {
+        "extend": "^3.0.0",
         "ws": "^4.1.0"
     }
 }
