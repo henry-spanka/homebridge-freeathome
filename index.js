@@ -120,6 +120,9 @@ BuschJaegerApPlatform.prototype.transformAccessories = function (actuators) {
 
 BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId) {
     switch (deviceId) {
+        case '1004':
+            return 'BuschJaegerThermostatAccessory';
+
         default:
             return null;
     }
