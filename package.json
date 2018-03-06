@@ -1,0 +1,25 @@
+{
+    "name": "homebridge-buschjaeger",
+    "version": "0.0.1",
+    "description": "Platform Plugin to manage busch-jaeger accessories via HomeBridge",
+    "license": "MIT",
+    "keywords": [
+        "homebridge-plugin",
+        "buschjaeger",
+        "busch-jaeger"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/example/homebridge.git"
+    },
+    "bugs": {
+        "url": "http://github.com/example/homebridge/issues"
+    },
+    "engines": {
+        "node": ">=0.12.0",
+        "homebridge": ">=0.2.0"
+    },
+    "dependencies": {
+        "ws": "^4.1.0"
+    }
+}
