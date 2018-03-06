@@ -32,6 +32,7 @@ function BuschJaegerApPlatform(log, config) {
 
     this.sysIP = config.sysIP;
     this.updateInterval = config.updateInterval;
+    this.blacklist = config.blacklist;
 
     this.log('Will try to connect to the SysAP at %s', this.sysIP);
 
@@ -104,12 +105,20 @@ BuschJaegerApPlatform.prototype.transformAccessories = function (actuators) {
     let acc = [];
 
     for (let serial in actuators) {
+        if (this.blacklist && serial in this.blacklist && this.blacklist[serial]['channels'].includes('*')) {
+            continue;
+        }
+
         let actuator = actuators[serial];
         let accessoryClass = this.getAccessoryClass(actuator['deviceId']);
         if (accessoryClass) {
             let service = require(path.join(__dirname, 'lib', accessoryClass));
             if (Object.keys(actuator['channels']).length > 1) {
                 for (let channel in actuator['channels']) {
+                    if (this.blacklist && serial in this.blacklist && this.blacklist[serial]['channels'].includes(channel)) {
+                        continue;
+                    }
+
                     let accessory = new service(this, Service, Characteristic, actuator, channel);
                     acc.push(accessory);
                 }
