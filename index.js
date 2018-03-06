@@ -57,7 +57,7 @@ function BuschJaegerApPlatform(log, config) {
 
         if (!that.scheduler) {
             that.scheduler = setInterval(function() {
-                this.ws.send('info');
+                this.update();
             }.bind(that), interval*1000);
         }
     });
@@ -108,9 +108,15 @@ BuschJaegerApPlatform.prototype.transformAccessories = function (actuators) {
         let accessoryClass = this.getAccessoryClass(actuator['deviceId']);
         if (accessoryClass) {
             let service = require(path.join(__dirname, 'lib', accessoryClass));
-            let accessory = new service(this, Service, Characteristic, actuator);
-
-            acc.push(accessory);
+            if (Object.keys(actuator['channels']).length > 1) {
+                for (let channel in actuator['channels']) {
+                    let accessory = new service(this, Service, Characteristic, actuator, channel);
+                    acc.push(accessory);
+                }
+            } else {
+                let accessory = new service(this, Service, Characteristic, actuator);
+                acc.push(accessory);
+            }
         }
     }
 
@@ -122,8 +128,14 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId) {
     switch (deviceId) {
         case '1004':
             return 'BuschJaegerThermostatAccessory';
+        case 'B001':
+            return 'BuschJaegerJalousieAccessory';
 
         default:
             return null;
     }
+}
+
+BuschJaegerApPlatform.prototype.update = function() {
+    this.ws.send('info');
 }
