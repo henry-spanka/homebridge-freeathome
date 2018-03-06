@@ -32,7 +32,7 @@ function BuschJaegerApPlatform(log, config) {
 
     this.sysIP = config.sysIP;
     this.updateInterval = config.updateInterval;
-    this.blacklist = config.blacklist;
+    this.mappings = config.mappings;
 
     this.log('Will try to connect to the SysAP at %s', this.sysIP);
 
@@ -105,7 +105,12 @@ BuschJaegerApPlatform.prototype.transformAccessories = function (actuators) {
     let acc = [];
 
     for (let serial in actuators) {
-        if (this.blacklist && serial in this.blacklist && this.blacklist[serial]['channels'].includes('*')) {
+        let mapping = {};
+        if (this.mappings && serial in this.mappings) {
+            mapping = this.mappings[serial];
+        }
+
+        if ('blacklist' in mapping && mapping['blacklist'].includes('*')) {
             continue;
         }
 
@@ -115,15 +120,15 @@ BuschJaegerApPlatform.prototype.transformAccessories = function (actuators) {
             let service = require(path.join(__dirname, 'lib', accessoryClass));
             if (Object.keys(actuator['channels']).length > 1) {
                 for (let channel in actuator['channels']) {
-                    if (this.blacklist && serial in this.blacklist && this.blacklist[serial]['channels'].includes(channel)) {
+                    if ('blacklist' in mapping && mapping['blacklist'].includes(channel)) {
                         continue;
                     }
 
-                    let accessory = new service(this, Service, Characteristic, actuator, channel);
+                    let accessory = new service(this, Service, Characteristic, actuator, channel, mapping);
                     acc.push(accessory);
                 }
             } else {
-                let accessory = new service(this, Service, Characteristic, actuator);
+                let accessory = new service(this, Service, Characteristic, actuator, null, mapping);
                 acc.push(accessory);
             }
         }
@@ -139,6 +144,8 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId) {
             return 'BuschJaegerThermostatAccessory';
         case 'B001':
             return 'BuschJaegerJalousieAccessory';
+        case 'B008':
+            return 'BuschJaegerSchaltAktorAccessory';
 
         default:
             return null;
