@@ -117,6 +117,7 @@ BuschJaegerApPlatform.prototype.transformAccessories = function (actuators) {
         }
 
         if ('blacklist' in mapping && mapping['blacklist'].includes('*')) {
+            this.log('Ignoring blacklisted accessory ' + actuator['typeName'] + ' with serial ' + serial);
             continue;
         }
 
@@ -127,6 +128,7 @@ BuschJaegerApPlatform.prototype.transformAccessories = function (actuators) {
             if (Object.keys(actuator['channels']).length > 1) {
                 for (let channel in actuator['channels']) {
                     if ('blacklist' in mapping && mapping['blacklist'].includes(channel)) {
+                        this.log('Ignoring blacklisted accessory ' + actuator['typeName'] + ' with serial ' + serial + ' and channel ' + channel);
                         continue;
                     }
 
@@ -137,6 +139,8 @@ BuschJaegerApPlatform.prototype.transformAccessories = function (actuators) {
                 let accessory = new service(this, Service, Characteristic, actuator, null, mapping);
                 acc.push(accessory);
             }
+        } else {
+            this.log('Ignoring non-supported accessory ' + actuator['typeName'] + ' with serial ' + serial);
         }
     }
 
