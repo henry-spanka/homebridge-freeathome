@@ -40,6 +40,8 @@ function BuschJaegerApPlatform(log, config) {
     this.actuatorInfo = {};
 
     this.scheduler = null;
+    this.subscribedUpdates = [];
+    this.subscribedOneTime = [];
 
     const that = this;
 
@@ -78,6 +80,23 @@ function BuschJaegerApPlatform(log, config) {
         }
 
         that.actuatorInfo = jsonData['result'];
+
+        /*
+        * Process all subscribed updates
+        * This should improve the UI change time and
+        * prevent flapping in most cases.
+        */
+        for(var i = 0; i < that.subscribedUpdates.length; i++) {
+            let subscribedUpdate = that.subscribedUpdates[i];
+
+            subscribedUpdate();
+        }
+
+        while (that.subscribedOneTime.length) {
+            let subscribedOneTime = that.subscribedOneTime.shift();
+
+            subscribedOneTime();
+        }
 
         if (that.accessoryCallbackSet) {
             that.transformAccessories(JSON.parse(data)['result']);
@@ -166,4 +185,12 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId) {
 
 BuschJaegerApPlatform.prototype.update = function() {
     this.ws.send('info');
+}
+
+BuschJaegerApPlatform.prototype.subscribe = function(callback) {
+    this.subscribedUpdates.push(callback);
+}
+
+BuschJaegerApPlatform.prototype.subscribeOneTime = function(callback) {
+    this.subscribedOneTime.push(callback);
 }
