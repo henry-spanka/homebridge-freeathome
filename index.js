@@ -32,7 +32,9 @@ function BuschJaegerApPlatform(log, config) {
 
     this.log('Will try to connect to the SysAP at %s', this.sysIP);
 
-    this.ws = new WebSocket('ws://' + this.sysIP + ':8001');
+    this.sysUrl = 'ws://' + this.sysIP + ':8001';
+
+    this.reconnecting = null;
 
     this.accessoryCallback = null;
     this.accessoryCallbackSet = false;
@@ -43,78 +45,7 @@ function BuschJaegerApPlatform(log, config) {
     this.subscribedUpdates = [];
     this.subscribedOneTime = [];
 
-    const that = this;
-
-    this.ws.on('open', function open() {
-        that.log('Successfully connected to the SysAP');
-
-        let interval = 10;
-
-        if (that.updateInterval && that.updateInterval > 0) {
-            interval = that.updateInterval;
-        }
-
-        if (!that.scheduler) {
-            that.scheduler = setInterval(function() {
-                this.update();
-            }.bind(that), interval*1000);
-        }
-    });
-
-    this.ws.on('close', function close() {
-        that.log('Disconnected from SysAP');
-
-        if(that.scheduler) {
-            clearInterval(scheduler);
-            that.scheduler = null;
-        }
-    });
-
-    this.ws.on('message', function incoming(data) {
-        that.log('Received a message from websocket');
-
-        let jsonData = JSON.parse(data);
-
-        if (!('result' in jsonData)) {
-            return;
-        }
-
-        that.actuatorInfo = jsonData['result'];
-
-        /*
-        * Process all subscribed updates
-        * This should improve the UI change time and
-        * prevent flapping in most cases.
-        */
-        for(var i = 0; i < that.subscribedUpdates.length; i++) {
-            let subscribedUpdate = that.subscribedUpdates[i];
-
-            subscribedUpdate();
-        }
-
-        while (that.subscribedOneTime.length) {
-            let subscribedOneTime = that.subscribedOneTime.shift();
-
-            subscribedOneTime();
-        }
-
-        if (that.accessoryCallbackSet) {
-            that.transformAccessories(JSON.parse(data)['result']);
-
-            /*
-            There may be an edge case where the connection to the SysAP Node Plugin
-            is established successfully but the SysAP Node Plugin can not authenticate against
-            the SysAP and therefore returns no accessories. This will remove all devices from the
-            HomeKit database.
-            */
-
-            if (that.foundAccessories.length > 1) {
-                that.accessoryCallback(that.foundAccessories);
-                that.accessoryCallback = null;
-                that.accessoryCallbackSet = false;
-            }
-        }
-    });
+    this.connect();
 
     this.foundAccessories = [];
 
@@ -126,7 +57,7 @@ BuschJaegerApPlatform.prototype.accessories = function(callback) {
     this.accessoryCallbackSet = true;
 }
 
-BuschJaegerApPlatform.prototype.transformAccessories = function (actuators) {
+BuschJaegerApPlatform.prototype.transformAccessories = function(actuators) {
     let acc = [];
 
     for (let serial in actuators) {
@@ -183,8 +114,113 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId) {
     }
 }
 
+BuschJaegerApPlatform.prototype.send = function(message) {
+    this.ws.send(message, function ack(error) {
+        if (error) {
+            this.log('Message could not be sent to the SysAp.');
+        }
+    }.bind(this));
+}
+
+BuschJaegerApPlatform.prototype.connect = function() {
+    this.log('Trying to connect to SysAP');
+    const that = this;
+
+    if (this.ws) {
+        this.ws.removeAllListeners();
+    }
+
+    this.ws = new WebSocket(this.sysUrl);
+
+    this.ws.on('open', function open() {
+        that.log('Successfully connected to the SysAP');
+
+        let interval = 10;
+
+        if (that.updateInterval && that.updateInterval > 0) {
+            interval = that.updateInterval;
+        }
+
+        if (!that.scheduler) {
+            that.scheduler = setInterval(function() {
+                this.update();
+            }.bind(that), interval * 1000);
+        }
+
+        if (that.reconnecting) {
+            clearInterval(that.reconnecting);
+            that.reconnecting = null;
+        }
+    });
+
+    this.ws.on('error', function error() {
+        that.log('Error while communicating with SysAp');
+    });
+
+    this.ws.on('close', function close() {
+        that.log('Disconnected from SysAP');
+
+        if (that.scheduler) {
+            clearInterval(that.scheduler);
+            that.scheduler = null;
+        }
+
+        if (!that.reconnecting) {
+            that.reconnecting = setInterval(function() {
+                this.connect();
+            }.bind(that), 10000);
+        }
+    });
+
+    this.ws.on('message', function incoming(data) {
+        that.log('Received a message from websocket');
+
+        let jsonData = JSON.parse(data);
+
+        if (!('result' in jsonData)) {
+            return;
+        }
+
+        that.actuatorInfo = jsonData['result'];
+
+        /*
+         * Process all subscribed updates
+         * This should improve the UI change time and
+         * prevent flapping in most cases.
+         */
+        for (var i = 0; i < that.subscribedUpdates.length; i++) {
+            let subscribedUpdate = that.subscribedUpdates[i];
+
+            subscribedUpdate();
+        }
+
+        while (that.subscribedOneTime.length) {
+            let subscribedOneTime = that.subscribedOneTime.shift();
+
+            subscribedOneTime();
+        }
+
+        if (that.accessoryCallbackSet) {
+            that.transformAccessories(JSON.parse(data)['result']);
+
+            /*
+            There may be an edge case where the connection to the SysAP Node Plugin
+            is established successfully but the SysAP Node Plugin can not authenticate against
+            the SysAP and therefore returns no accessories. This will remove all devices from the
+            HomeKit database.
+            */
+
+            if (that.foundAccessories.length > 1) {
+                that.accessoryCallback(that.foundAccessories);
+                that.accessoryCallback = null;
+                that.accessoryCallbackSet = false;
+            }
+        }
+    });
+}
+
 BuschJaegerApPlatform.prototype.update = function() {
-    this.ws.send('info');
+    this.send('info');
 }
 
 BuschJaegerApPlatform.prototype.subscribe = function(callback) {
