@@ -42,8 +42,6 @@ function BuschJaegerApPlatform(log, config) {
     this.actuatorInfo = {};
 
     this.scheduler = null;
-    this.subscribedUpdates = [];
-    this.subscribedOneTime = [];
 
     this.connect();
 
@@ -135,7 +133,7 @@ BuschJaegerApPlatform.prototype.connect = function() {
     this.ws.on('open', function open() {
         that.log('Successfully connected to the SysAP');
 
-        let interval = 10;
+        let interval = 60;
 
         if (that.updateInterval && that.updateInterval > 0) {
             interval = that.updateInterval;
@@ -151,6 +149,8 @@ BuschJaegerApPlatform.prototype.connect = function() {
             clearInterval(that.reconnecting);
             that.reconnecting = null;
         }
+
+        that.update();
     });
 
     this.ws.on('error', function error() {
@@ -175,58 +175,87 @@ BuschJaegerApPlatform.prototype.connect = function() {
     this.ws.on('message', function incoming(data) {
         that.log('Received a message from websocket');
 
-        let jsonData = JSON.parse(data);
+        that.processMessage(data);
+    });
+}
 
-        if (!('result' in jsonData)) {
-            return;
-        }
+BuschJaegerApPlatform.prototype.processMessage = function(message) {
+    let jsonData = JSON.parse(message);
 
-        that.actuatorInfo = jsonData['result'];
+    if (!('result' in jsonData)) {
+        this.log('Invalid message received.');
+        return;
+    }
+
+    var isUpdate = false;
+
+    if ('type' in jsonData && jsonData['type'] == 'update') {
+        this.processUpdate(jsonData['result']);
+        isUpdate = true;
+    } else {
+        // Full data received
+        this.actuatorInfo = jsonData['result'];
+    }
+
+    if (this.accessoryCallbackSet && !isUpdate) {
+        this.transformAccessories(JSON.parse(message)['result']);
 
         /*
-         * Process all subscribed updates
-         * This should improve the UI change time and
-         * prevent flapping in most cases.
-         */
-        for (var i = 0; i < that.subscribedUpdates.length; i++) {
-            let subscribedUpdate = that.subscribedUpdates[i];
-
-            subscribedUpdate();
+        There may be an edge case where the connection to the SysAP Node Plugin
+        is established successfully but the SysAP Node Plugin can not authenticate against
+        the SysAP and therefore returns no accessories. This will remove all devices from the
+        HomeKit database.
+        */
+        if (this.foundAccessories.length >= 1) {
+            this.accessoryCallback(this.foundAccessories);
+            this.accessoryCallback = null;
+            this.accessoryCallbackSet = false;
         }
-
-        while (that.subscribedOneTime.length) {
-            let subscribedOneTime = that.subscribedOneTime.shift();
-
-            subscribedOneTime();
-        }
-
-        if (that.accessoryCallbackSet) {
-            that.transformAccessories(JSON.parse(data)['result']);
-
-            /*
-            There may be an edge case where the connection to the SysAP Node Plugin
-            is established successfully but the SysAP Node Plugin can not authenticate against
-            the SysAP and therefore returns no accessories. This will remove all devices from the
-            HomeKit database.
-            */
-
-            if (that.foundAccessories.length > 1) {
-                that.accessoryCallback(that.foundAccessories);
-                that.accessoryCallback = null;
-                that.accessoryCallbackSet = false;
-            }
-        }
-    });
+    }
 }
 
 BuschJaegerApPlatform.prototype.update = function() {
     this.send('info');
 }
 
-BuschJaegerApPlatform.prototype.subscribe = function(callback) {
-    this.subscribedUpdates.push(callback);
+BuschJaegerApPlatform.prototype.processUpdate = function(actuators) {
+    for (let serial in actuators) {
+        for (let channel in actuators[serial]['channels']) {
+            let channels = actuators[serial]['channels'][channel];
+            for (let datapoint in channels['datapoints']) {
+                if (this.actuatorInfo[serial]) {
+                    if (!this.actuatorInfo[serial]['channels'][channel]) {
+                        this.actuatorInfo[serial]['channels'][channel] = {'datapoints': {}};
+                    }
+
+                    let value = channels['datapoints'][datapoint];
+                    this.actuatorInfo[serial]['channels'][channel]['datapoints'][datapoint] = value;
+                    this.sendUpdateToAccessory(serial, channel.replace('ch',''), datapoint, value);
+                }
+            }
+        }
+    }
 }
 
-BuschJaegerApPlatform.prototype.subscribeOneTime = function(callback) {
-    this.subscribedOneTime.push(callback);
+BuschJaegerApPlatform.prototype.sendUpdateToAccessory = function(serial, channel, datapoint, value = null) {
+    let accessory = this.findAccessoryBySerial(serial, channel);
+
+    if (accessory) {
+        accessory.update(channel, datapoint, value);
+    }
+}
+
+BuschJaegerApPlatform.prototype.findAccessoryBySerial = function(sn, ch = null) {
+    for (let i = 0; i < this.foundAccessories.length; i++) {
+        if (this.foundAccessories[i].serial == sn) {
+            if (!ch && !this.foundAccessories[i].channel) {
+                return this.foundAccessories[i];
+            }
+            if (ch && this.foundAccessories[i].channel && this.foundAccessories[i].channel == ch) {
+                return this.foundAccessories[i];
+            }
+        }
+    }
+
+    return null;
 }
