@@ -41,7 +41,7 @@ To configure the plugin add the following json in the platform section in `confi
 {
     "platform": "BuschJaegerSysAp",
     "sysIP": "<IP>",
-    "updateInterval": 5,
+    "updateInterval": 60,
     "mappings": {}
 }
 ```
@@ -54,7 +54,7 @@ You can configure the *mappings* if you want to ignore an actuator or channel if
 {
     "platform": "BuschJaegerSysAp",
     "sysIP": "<IP>",
-    "updateInterval": 5,
+    "updateInterval": 60,
     "mappings": {
         "<ACTUATOR-SERIAL>": {
             "blacklist": ["ch0000", "ch0001"],
