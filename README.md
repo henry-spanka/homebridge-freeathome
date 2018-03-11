@@ -32,7 +32,7 @@ Homebridge platform plugin for Busch-Jaeger SmartHome devices.
 1. [Install Homebridge]
 2. `npm install homebridge-buschjaeger`
 3. [Install Busch-Jaeger API]
-4. Edit `config.json` and configure platform. See [Configuration] section.
+4. Edit `config.json` and configure platform. See [Configuration](#Configuration) section.
 5. Start Homebridge
 6. Star the repository ;)
 
