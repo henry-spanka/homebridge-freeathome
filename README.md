@@ -3,6 +3,7 @@
 [Configuration]: #Configuration
 
 [sstadlberger]: https://github.com/sstadlberger
+[Home Hub]: https://support.apple.com/en-us/HT207057
 
 
 # Homebridge-Buschjaeger
@@ -33,6 +34,7 @@ Homebridge platform plugin for Busch-Jaeger SmartHome devices.
 3. [Install Busch-Jaeger API]
 4. Edit `config.json` and configure platform. See [Configuration] section.
 5. Start Homebridge
+6. Star the repository ;)
 
 # Configuration
 
@@ -69,7 +71,13 @@ You can configure the *mappings* if you want to ignore an actuator or channel if
 You can find the actuator serial in the web interface of the Busch-Jaeger SysAp Interface.
 
 # Limitations
-The door can not be controlled with HomeKit as the bus is not connected to the SysAp.
+* The door can not be controlled with HomeKit as the bus is not connected to the SysAp.
+* The door camera can not be accessed. You may want to use IP cameras that are compatible with
+other HomeBridge plugins.
+
+# Notes
+* The accessories can only be controlled when your're at home in your local WiFi network.
+To manage your accessories remotely you need to setup an iPad/Homepod or Apple TV as a [Home Hub].
 
 # Help
 If you have any questions or help please open an issue on the GitHub project page.
