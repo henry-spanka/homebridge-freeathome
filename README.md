@@ -83,9 +83,8 @@ To manage your accessories remotely you need to setup an iPad/Homepod or Apple T
 If you have any questions or help please open an issue on the GitHub project page.
 
 # Contributing
-Pull requests are always welcomed. I currently do not have any more Buschjaeger devices (actuators) and
-can therefore not implement them. If you have a device that is not supported please let me know so I can work
-on integrating them or make a pull request yourself.
+Pull requests are always welcome. If you have a device that is not supported yet please open an issue or open a pull request with
+your modifications.
 
 # License
 The project is subject to the MIT license. A copy can be found in the root directory of the project [LICENSE](LICENSE).
