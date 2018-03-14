@@ -23,7 +23,7 @@ Homebridge platform plugin for Busch-Jaeger SmartHome devices.
 - Sensor/ Schaltaktor 8/8fach, REG (B008)
 - Jalousieaktor 4-fach, REG (B001)
 - Sensor/ Jalousieaktor 2/1-fach (1015)
-- Sensor/ Jalousieaktor 1/1-fach (1013
+- Sensor/ Jalousieaktor 1/1-fach (1013)
 
 # Requirements
 * Busch-Jaeger Access Point
