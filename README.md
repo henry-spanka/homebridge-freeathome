@@ -19,6 +19,7 @@ Homebridge platform plugin for Busch-Jaeger SmartHome devices.
 
 # Supported devices
 - Dimmaktor 4-fach (1021)
+- Dimmaktor 4-fach (101C)
 - Raumtemperaturregler (1004)
 - Sensor/ Schaltaktor 8/8fach, REG (B008)
 - Jalousieaktor 4-fach, REG (B001)
