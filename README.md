@@ -79,7 +79,7 @@ You can find the actuator serial in the web interface of the Busch-Jaeger SysAp 
 other HomeBridge plugins.
 
 # Notes
-* The accessories can only be controlled when your're at home in your local WiFi network.
+* The accessories can only be controlled when you're at home in your local WiFi network.
 To manage your accessories remotely you need to setup an iPad/Homepod or Apple TV as a [Home Hub].
 
 # Tips & Tricks
