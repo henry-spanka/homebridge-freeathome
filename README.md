@@ -88,6 +88,9 @@ HomeKit if it is not detected during discovery.
 * If the HomeKit UI does not respond to manual changes (switch pressed) or the accessory doesn't update itself try to
 disable myBuschJaeger and re-enable it in the SysAp Webinterface.
 
+# Changelog
+The changelog can be viewed [here](CHANGELOG.md).
+
 # Help
 If you have any questions or help please open an issue on the GitHub project page.
 
