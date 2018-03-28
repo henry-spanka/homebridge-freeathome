@@ -1,3 +1,25 @@
+## 1.0.0 (2018-03-28)
+
+##### Features
+
+* **Actuator:** Added support for:
+    - Dimmaktor 4-fach (101C)
+    - Sensor/ Jalousieaktor 2/1-fach (1015)
+    - Sensor/ Jalousieaktor 1/1-fach (1013)
+    - Sonos Media Player (0001)
+
+##### Bug Fixes
+
+* **Accessory:** Fix lockup of JalousieAccessory
+
+##### Improvements
+
+* **API:** Make the UI more reactive by listening for websocket events from the SysAp
+* **API:** Update only once every 60 seconds by default to reduce load
+
+##### Upgrade Notes
+* **API:** The plugin depends on features that have not yet been merged in the API project and therefore you need to use the fork https://github.com/henry-spanka/home
+
 #### 0.0.2 (2018-03-09)
 
 ##### Features
