@@ -92,6 +92,9 @@ disable myBuschJaeger and re-enable it in the SysAp Webinterface.
 # Changelog
 The changelog can be viewed [here](CHANGELOG.md).
 
+# Upgrade Notes
+Upgrade Notes can be found in the [CHANGELOG](CHANGELOG).
+
 # Help
 If you have any questions or help please open an issue on the GitHub project page.
 
