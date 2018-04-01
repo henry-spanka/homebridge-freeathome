@@ -1,3 +1,10 @@
+### 1.1.0 (2018-04-01)
+
+##### Features
+
+* **Actuator:** Added support for:
+    - Schaltaktor 4-fach, 16A, REG (B002)
+
 ## 1.0.0 (2018-03-28)
 
 ##### Features
