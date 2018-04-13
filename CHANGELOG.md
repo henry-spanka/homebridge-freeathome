@@ -25,7 +25,7 @@
 * **API:** Update only once every 60 seconds by default to reduce load
 
 ##### Upgrade Notes
-* **API:** The plugin depends on features that have not yet been merged in the API project and therefore you need to use the fork https://github.com/henry-spanka/home
+* ~~**API:** The plugin depends on features that have not yet been merged in the API project and therefore you need to use the fork https://github.com/henry-spanka/home~~
 
 #### 0.0.2 (2018-03-09)
 

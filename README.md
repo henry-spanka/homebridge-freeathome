@@ -1,5 +1,5 @@
 [Install Homebridge]: https://github.com/nfarina/homebridge#installation
-[Install Busch-Jaeger API]: https://github.com/henry-spanka/home
+[Install Busch-Jaeger API]: https://github.com/sstadlberger/home
 [Configuration]: #Configuration
 
 [sstadlberger]: https://github.com/sstadlberger
