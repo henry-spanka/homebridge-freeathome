@@ -87,8 +87,8 @@ To manage your accessories remotely you need to setup an iPad/Homepod or Apple T
 # Tips & Tricks
 * Do not restart Homebridge if you are either updating the SysAp or an actuator as the accessory may be removed from
 HomeKit if it is not detected during discovery.
-* If the HomeKit UI does not respond to manual changes (switch pressed) or the accessory doesn't update itself try to
-disable myBuschJaeger and re-enable it in the SysAp Webinterface.
+* ~~If the HomeKit UI does not respond to manual changes (switch pressed) or the accessory doesn't update itself try to
+disable myBuschJaeger and re-enable it in the SysAp Webinterface.~~
 
 # Changelog
 The changelog can be viewed [here](CHANGELOG.md).
