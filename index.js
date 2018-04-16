@@ -84,8 +84,7 @@ BuschJaegerApPlatform.prototype.transformAccessories = function(actuators) {
                     acc.push(accessory);
                 }
             } else {
-                let accessory = new service(this, Service, Characteristic, actuator, null, mapping);
-                acc.push(accessory);
+                this.log('Found supported accessory ' + actuator['typeName'] + ' with serial ' + serial + ' but no channels detected. Is this a bug?');
             }
         } else {
             this.log('Ignoring non-supported accessory ' + actuator['typeName'] + ' with serial ' + serial);
