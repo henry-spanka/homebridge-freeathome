@@ -1,3 +1,10 @@
+### 1.2.0 (2018-04-16)
+
+##### Features
+
+* **Actuator:** Added support for:
+    - Sensor/ Schaltaktor 1/1-fach (100C)
+
 ### 1.1.0 (2018-04-01)
 
 ##### Features
