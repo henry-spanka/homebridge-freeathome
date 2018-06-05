@@ -106,6 +106,7 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId) {
         case 'B008':
         case 'B002':
         case '100C':
+        case '1010':
             return 'BuschJaegerSchaltAktorAccessory';
         case '1021':
         case '101C':
