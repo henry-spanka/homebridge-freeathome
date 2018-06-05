@@ -1,3 +1,11 @@
+### 1.3.0 (2018-06-05)
+
+##### Features
+
+
+* **Actuator** Added support for:
+    - Sensor/ Schaltaktor 2/2-fach (1010)
+
 ### 1.2.0 (2018-04-16)
 
 ##### Features
