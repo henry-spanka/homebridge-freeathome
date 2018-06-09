@@ -80,7 +80,17 @@ BuschJaegerApPlatform.prototype.transformAccessories = function(actuators) {
                         continue;
                     }
 
-                    let accessory = new service(this, Service, Characteristic, actuator, channel, mapping);
+                    let accessory;
+
+                    // Hack to expose DoorBell service.
+                    if ('doorbell' in mapping && mapping['doorbell'].includes(channel)) {
+                        let accessoryClass = this.getAccessoryClass('doorbell');
+                        let service = require(path.join(__dirname, 'lib', accessoryClass));
+                        accessory = new service(this, Service, Characteristic, actuator, channel, mapping);
+                    } else {
+                        accessory = new service(this, Service, Characteristic, actuator, channel, mapping);
+                    }
+
                     acc.push(accessory);
                 }
             } else {
@@ -113,6 +123,8 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId) {
             return 'BuschJaegerDimmAktorAccessory';
         case '0001':
             return 'BuschJaegerMediaPlayerAccessory';
+        case 'doorbell':
+            return 'BuschJaegerDoorBellAccessory';
 
         default:
             return null;
