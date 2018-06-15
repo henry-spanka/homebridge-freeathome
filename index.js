@@ -2,7 +2,7 @@
 
 const path = require('path');
 
-var Service, Characteristic
+var Service, Characteristic, Hap, PlatformAccessory
 
 const WebSocket = require('ws');
 
@@ -12,6 +12,8 @@ module.exports = function(homebridge) {
     // Service and Characteristic are from hap-nodejs
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
+    Hap = homebridge.hap;
+    PlatformAccessory = homebridge.platformAccessory;
 
     // For platform plugin to be considered as dynamic platform plugin,
     // registerPlatform(pluginName, platformName, constructor, dynamic), dynamic must be true
@@ -21,8 +23,11 @@ module.exports = function(homebridge) {
 // Platform constructor
 // config may be null
 // api may be null if launched from old homebridge version
-function BuschJaegerApPlatform(log, config) {
+function BuschJaegerApPlatform(log, config, api) {
     this.log = log;
+    this.hap = Hap;
+    this.api = api;
+    this.platformAccessory = PlatformAccessory;
 
     this.log('Initialising BuschJaeger Plugin');
 
@@ -83,8 +88,13 @@ BuschJaegerApPlatform.prototype.transformAccessories = function(actuators) {
                     let accessory;
 
                     // Hack to expose DoorBell service.
-                    if ('doorbell' in mapping && mapping['doorbell'].includes(channel)) {
+                    if ('doorbell' in mapping && channel in mapping['doorbell']) {
+                        let doorbell = mapping['doorbell'][channel];
                         let accessoryClass = this.getAccessoryClass('doorbell');
+                        if (doorbell['video']) {
+                            accessoryClass = this.getAccessoryClass('videodoorbell');
+                        }
+
                         let service = require(path.join(__dirname, 'lib', accessoryClass));
                         accessory = new service(this, Service, Characteristic, actuator, channel, mapping);
                     } else {
@@ -125,6 +135,8 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId) {
             return 'BuschJaegerMediaPlayerAccessory';
         case 'doorbell':
             return 'BuschJaegerDoorBellAccessory';
+        case 'videodoorbell':
+            return 'BuschJaegerVideoDoorBellAccessory';
 
         default:
             return null;
@@ -226,7 +238,9 @@ BuschJaegerApPlatform.prototype.processMessage = function(message) {
         HomeKit database.
         */
         if (this.foundAccessories.length >= 1) {
-            this.accessoryCallback(this.foundAccessories);
+            // Only expose if accessory has more than one service (first is informationService)
+            let filteredAccessories = this.foundAccessories.filter(accessory => accessory.getServices().length > 1);
+            this.accessoryCallback(filteredAccessories);
             this.accessoryCallback = null;
             this.accessoryCallbackSet = false;
         }
