@@ -84,9 +84,10 @@ See the [DoorBell Tutorial](docs/DoorBellTutorial.md) on how to setup the BuschJ
 You can find the actuator serial in the web interface of the Busch-Jaeger SysAp Interface.
 
 # Limitations
-* The door can not be controlled with HomeKit as the bus is not connected to the SysAp.
-* The door camera can not be accessed. You may want to use IP cameras that are compatible with
-other HomeBridge plugins.
+* ~~The door can not be controlled with HomeKit as the bus is not connected to the SysAp.~~
+*May actually be possible but not tested it yet.*
+* The door camera can not be accessed. You may want to use IP cameras that support the rtsp protocol and use
+the video door bell.
 
 # Notes
 * The accessories can only be controlled when you're at home in your local WiFi network.
@@ -95,8 +96,7 @@ To manage your accessories remotely you need to setup an iPad/Homepod or Apple T
 # Tips & Tricks
 * Do not restart Homebridge if you are either updating the SysAp or an actuator as the accessory may be removed from
 HomeKit if it is not detected during discovery.
-* ~~If the HomeKit UI does not respond to manual changes (switch pressed) or the accessory doesn't update itself try to
-disable myBuschJaeger and re-enable it in the SysAp Webinterface.~~
+* If the HomeKit UI does not respond to manual changes (switch pressed) or the accessory doesn't update itself log into the System Access Point interface and log out again. This must be done sometimes after a reboot to enable websocket notifications.
 
 # Changelog
 The changelog can be viewed [here](CHANGELOG.md).
