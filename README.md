@@ -30,6 +30,9 @@ Homebridge platform plugin for Busch-Jaeger SmartHome devices.
 - Sensor/ Jalousieaktor 1/1-fach (1013)
 - Sonos Media Player (0001)
 
+# Custom Actuators
+- A switch actuator can be exposed as a (video) DoorBell.
+
 # Requirements
 * Busch-Jaeger Access Point
 * A linux-based server on your home network that runs 24/7 like a Raspberry Pi.
@@ -75,6 +78,9 @@ You can configure the *mappings* if you want to ignore an actuator or channel if
 }
 ```
 
+## (Video) DoorBell
+See the [DoorBell Tutorial](docs/DoorBellTutorial.md) on how to setup the BuschJaeger DoorBell in HomeKit.
+
 You can find the actuator serial in the web interface of the Busch-Jaeger SysAp Interface.
 
 # Limitations
@@ -106,7 +112,7 @@ Pull requests are always welcome. If you have a device that is not supported yet
 your modifications.
 
 # License
-The project is subject to the MIT license. A copy can be found in the root directory of the project [LICENSE](LICENSE).
+The project is subject to the MIT license unless otherwise noted. A copy can be found in the root directory of the project [LICENSE](LICENSE).
 
 # Thanks
 Special thanks to [sstadlberger] for his effort to make a custom API interface for Busch-Jaeger.
