@@ -10,6 +10,8 @@
 
 Homebridge platform plugin for Busch-Jaeger SmartHome devices.
 
+[![NPM](https://nodei.co/npm/homebridge-buschjaeger.png?compact=true)](https://npmjs.org/package/homebridge-buschjaeger)
+
 ![HomeKit UI](images/example_homekit_ui.png)
 
 # Features
