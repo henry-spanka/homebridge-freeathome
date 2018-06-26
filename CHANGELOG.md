@@ -1,3 +1,10 @@
+### 1.4.0 (2018-06-26)
+
+##### Features
+
+* **Custom Actuator** Added support for:
+    - (Video) Door bell
+
 ### 1.3.0 (2018-06-05)
 
 ##### Features
