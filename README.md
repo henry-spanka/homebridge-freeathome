@@ -80,10 +80,10 @@ You can configure the *mappings* if you want to ignore an actuator or channel if
 }
 ```
 
+You can find the actuator serial in the web interface of the Busch-Jaeger SysAp Interface.
+
 ## (Video) DoorBell
 See the [DoorBell Tutorial](docs/DoorBellTutorial.md) on how to setup the BuschJaeger DoorBell in HomeKit.
-
-You can find the actuator serial in the web interface of the Busch-Jaeger SysAp Interface.
 
 # Limitations
 * ~~The door can not be controlled with HomeKit as the bus is not connected to the SysAp.~~
