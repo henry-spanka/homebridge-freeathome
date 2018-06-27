@@ -97,6 +97,12 @@ BuschJaegerApPlatform.prototype.transformAccessories = function(actuators) {
 
                         let service = require(path.join(__dirname, 'lib', accessoryClass));
                         accessory = new service(this, Service, Characteristic, actuator, channel, mapping);
+                    } else if ('garagedoor' in mapping && channel in mapping['garagedoor']) {
+                        let garagedoor = mapping['garagedoor'][channel];
+                        let accessoryClass = this.getAccessoryClass('garagedoor');
+
+                        let service = require(path.join(__dirname, 'lib', accessoryClass));
+                        accessory = new service(this, Service, Characteristic, actuator, channel, mapping);
                     } else {
                         accessory = new service(this, Service, Characteristic, actuator, channel, mapping);
                     }
@@ -137,6 +143,8 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId) {
             return 'BuschJaegerDoorBellAccessory';
         case 'videodoorbell':
             return 'BuschJaegerVideoDoorBellAccessory';
+        case 'garagedoor':
+            return 'BuschJaegerGarageDoorAccessory';
 
         default:
             return null;
