@@ -34,6 +34,7 @@ Homebridge platform plugin for Busch-Jaeger SmartHome devices.
 
 # Custom Actuators
 - A switch actuator can be exposed as a (video) DoorBell.
+- A switch actuator can be exposed as a Garage Door.
 
 # Requirements
 * Busch-Jaeger Access Point
