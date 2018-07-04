@@ -86,6 +86,9 @@ You can find the actuator serial in the web interface of the Busch-Jaeger SysAp 
 ## (Video) DoorBell
 See the [DoorBell Tutorial](docs/DoorBellTutorial.md) on how to setup the BuschJaeger DoorBell in HomeKit.
 
+## Garage Door
+See the [GarageDoor Tutorial](docs/GarageDoorTutorial.md) on how to expose a Switch actuator as a GarageDoor accessory.
+
 # Limitations
 * ~~The door can not be controlled with HomeKit as the bus is not connected to the SysAp.~~
 *May actually be possible but not tested it yet.*
