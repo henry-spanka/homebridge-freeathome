@@ -1,3 +1,18 @@
+### 1.5.0 (2018-07-04)
+
+##### Features
+
+* **Custom Actuator** Added support for:
+    - Garage Door
+
+##### Bug Fixes
+* **BuschJaegerThermostatAccessory**:
+    - fixed Thermostat heating to 35 °C / cooling to 7 °C
+    - fixed incorrect temperature readout
+    - set min value to 7 °C and max to 35 °C
+    - enable heating mode before changing target temperature when mode is off
+    - fixed incorrect current heating state
+
 ### 1.4.0 (2018-06-26)
 
 ##### Features
