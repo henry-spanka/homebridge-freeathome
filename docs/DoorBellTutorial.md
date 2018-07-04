@@ -7,7 +7,7 @@ to HomeKit as a VideoDoorBell (not a motion sensor). However they will function 
 Unfortunately the Busch Welcome video camera does not work as I haven't found a way to
 gain access to the video feed. There may be the
 possibility to hack into the video feed via the IP-Gateway but I do not have one
-so any help would be appreciated. This is why I use a Surveillence Camera instead
+so any help would be appreciated. This is why I use a Surveillance Camera instead
 to get a snapshot when the door bell is ringing.
 
 ## Requirements
