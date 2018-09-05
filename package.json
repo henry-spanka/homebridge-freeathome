@@ -1,6 +1,6 @@
 {
     "name": "homebridge-buschjaeger",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "description": "Platform Plugin to manage busch-jaeger accessories via HomeBridge",
     "license": "MIT",
     "keywords": [

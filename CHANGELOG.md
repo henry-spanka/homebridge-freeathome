@@ -1,3 +1,10 @@
+#### 1.5.1 (2018-09-05)
+
+##### Bug Fixes
+
+* Fixed a bug that caused (switch) actuators not to react if they are turned on,
+on homebridge start
+
 ### 1.5.0 (2018-07-04)
 
 ##### Features
