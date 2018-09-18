@@ -1,3 +1,10 @@
+#### 1.5.2 (2018-09-18)
+
+##### Features
+
+* The thermostat accessory now reports temperature in 0.5 steps for increased accuracy.
+As this is a non-breaking feature it will included in a patch release.
+
 #### 1.5.1 (2018-09-05)
 
 ##### Bug Fixes
