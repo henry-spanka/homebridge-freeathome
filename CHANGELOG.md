@@ -1,3 +1,9 @@
+#### 1.5.3 (2019-01-25)
+
+##### Bug Fixes
+
+* Fixed crash if all channels of an actuator were blacklisted.
+
 #### 1.5.2 (2018-09-18)
 
 ##### Features
