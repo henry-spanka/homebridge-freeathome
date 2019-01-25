@@ -69,12 +69,13 @@ BuschJaegerApPlatform.prototype.transformAccessories = function(actuators) {
             mapping = this.mappings[serial];
         }
 
+        let actuator = actuators[serial];
+
         if ('blacklist' in mapping && mapping['blacklist'].includes('*')) {
             this.log('Ignoring blacklisted accessory ' + actuator['typeName'] + ' with serial ' + serial);
             continue;
         }
 
-        let actuator = actuators[serial];
         let accessoryClass = this.getAccessoryClass(actuator['deviceId']);
         if (accessoryClass) {
             let service = require(path.join(__dirname, 'lib', accessoryClass));
