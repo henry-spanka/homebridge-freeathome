@@ -1,3 +1,10 @@
+#### 1.5.4 (2019-04-01)
+
+##### Improvements
+
+* **BuschJaegerJalousieAccessory**:  
+    Moving the shutters is now more reliable (than ever) and should not cause the shutters to stop and start when the position is changed multiple times while moving. Additionally position changes should now be exact and reflect the actual window.
+
 #### 1.5.3 (2019-01-25)
 
 ##### Bug Fixes
