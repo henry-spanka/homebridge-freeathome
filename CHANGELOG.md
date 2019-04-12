@@ -1,3 +1,9 @@
+#### 1.5.5 (2019-04-12)
+
+##### Improvements
+
+* If no response has been received from the SysAp within 5 seconds the accessory will show an error within HomeKit and the pending event will be cleaned up. This prevents the HomeKit UI from not responding for up to 1 minute with left over event which eventually may crash homebridge.
+
 #### 1.5.4 (2019-04-01)
 
 ##### Improvements
