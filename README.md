@@ -30,6 +30,7 @@ Homebridge platform plugin for Busch-Jaeger SmartHome devices.
 - Jalousieaktor 4-fach, REG (B001)
 - Sensor/ Jalousieaktor 2/1-fach (1015)
 - Sensor/ Jalousieaktor 1/1-fach (1013)
+- free@homeTouch 7 (1038) [Door Lock Only]
 - Sonos Media Player (0001)
 
 # Custom Actuators
@@ -77,11 +78,17 @@ You can configure the *mappings* if you want to ignore an actuator or channel if
         "<ACTUATOR-SERIAL>": {
             "blacklist": ["*"],
         },
+        "<ACTUATOR-SERIAL>": {
+            "whitelist": ["ch0010"] # Only for Door Lock - free@homeTouch 7 at the moment.
+        }
+
     }
 }
 ```
 
 You can find the actuator serial in the web interface of the Busch-Jaeger SysAp Interface.
+
+Some actuators (like Door Lock - free@homeTouch 7) require the channel to be explicitly whitelisted.
 
 ## (Video) DoorBell
 See the [DoorBell Tutorial](docs/DoorBellTutorial.md) on how to setup the BuschJaeger DoorBell in HomeKit.
