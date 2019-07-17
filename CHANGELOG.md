@@ -1,3 +1,10 @@
+#### 1.6.0 (2019-07-17)
+
+##### Features
+
+* **Actuator:** Added support for:
+    - free@homeTouch 7 (1038) [Door Lock Only]
+
 #### 1.5.5 (2019-04-12)
 
 ##### Improvements
