@@ -76,13 +76,20 @@ BuschJaegerApPlatform.prototype.transformAccessories = function(actuators) {
             continue;
         }
 
-        let accessoryClass = this.getAccessoryClass(actuator['deviceId']);
+        let accessoryClass, requireWhitelisted;
+
+        [accessoryClass, requireWhitelisted] = this.getAccessoryClass(actuator['deviceId']);
         if (accessoryClass) {
             let service = require(path.join(__dirname, 'lib', accessoryClass));
             if (Object.keys(actuator['channels']).length > 0) {
                 for (let channel in actuator['channels']) {
                     if ('blacklist' in mapping && mapping['blacklist'].includes(channel)) {
                         this.log('Ignoring blacklisted accessory ' + actuator['typeName'] + ' with serial ' + serial + ' and channel ' + channel);
+                        continue;
+                    }
+
+                    if (requireWhitelisted && (!('whitelist' in mapping) || !mapping['whitelist'].includes(channel))) {
+                        this.log('Ignoring non-whitelisted accessory ' + actuator['typeName'] + ' with serial ' + serial + ' and channel ' + channel);
                         continue;
                     }
 
@@ -125,30 +132,32 @@ BuschJaegerApPlatform.prototype.transformAccessories = function(actuators) {
 BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId) {
     switch (deviceId) {
         case '1004':
-            return 'BuschJaegerThermostatAccessory';
+            return ['BuschJaegerThermostatAccessory', false];
         case 'B001':
         case '1015':
         case '1013':
-            return 'BuschJaegerJalousieAccessory';
+            return ['BuschJaegerJalousieAccessory', false];
         case 'B008':
         case 'B002':
         case '100C':
         case '1010':
-            return 'BuschJaegerSchaltAktorAccessory';
+            return ['BuschJaegerSchaltAktorAccessory', false];
         case '1021':
         case '101C':
-            return 'BuschJaegerDimmAktorAccessory';
+            return ['BuschJaegerDimmAktorAccessory', false];
         case '0001':
-            return 'BuschJaegerMediaPlayerAccessory';
+            return ['BuschJaegerMediaPlayerAccessory', false];
+        case '1038':
+            return ['BuschJaegerDoorLockAccessory', true];
         case 'doorbell':
-            return 'BuschJaegerDoorBellAccessory';
+            return ['BuschJaegerDoorBellAccessory', false];
         case 'videodoorbell':
-            return 'BuschJaegerVideoDoorBellAccessory';
+            return ['BuschJaegerVideoDoorBellAccessory', false];
         case 'garagedoor':
-            return 'BuschJaegerGarageDoorAccessory';
+            return ['BuschJaegerGarageDoorAccessory', false];
 
         default:
-            return null;
+            return [null, false];
     }
 }
 
