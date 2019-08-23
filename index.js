@@ -109,6 +109,11 @@ BuschJaegerApPlatform.prototype.transformAccessories = function(actuators) {
 
                         let service = require(path.join(__dirname, 'lib', accessoryClass));
                         accessory = new service(this, Service, Characteristic, actuator, channel, mapping);
+                    } else if ('binarysensor' in mapping && channel in mapping['binarysensor']) {
+                        let [accessoryClass] = this.getAccessoryClass('binarysensor');
+
+                        let service = require(path.join(__dirname, 'lib', accessoryClass));
+                        accessory = new service(this, Service, Characteristic, actuator, channel, mapping);
                     } else {
                         accessory = new service(this, Service, Characteristic, actuator, channel, mapping);
                     }
@@ -147,12 +152,17 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId) {
             return ['BuschJaegerMediaPlayerAccessory', false];
         case '1038':
             return ['BuschJaegerDoorLockAccessory', true];
+        case 'B005':
+        case 'B007':
+            return ['BuschJaegerBinarySensorAccessory', false];
         case 'doorbell':
             return ['BuschJaegerDoorBellAccessory', false];
         case 'videodoorbell':
             return ['BuschJaegerVideoDoorBellAccessory', false];
         case 'garagedoor':
             return ['BuschJaegerGarageDoorAccessory', false];
+        case 'binarysensor':
+            return ['BuschJaegerBinarySensorAccessory', false];
 
         default:
             return [null, false];
