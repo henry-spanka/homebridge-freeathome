@@ -98,7 +98,7 @@ See the [GarageDoor Tutorial](docs/GarageDoorTutorial.md) on how to expose a Swi
 
 # Limitations
 * ~~The door can not be controlled with HomeKit as the bus is not connected to the SysAp.~~
-*May actually be possible but not tested it yet.*
+*Already implemented via free@HomeTouch 7 Panel*
 * The door camera can not be accessed. You may want to use IP cameras that support the rtsp protocol and use
 the video door bell.
 
