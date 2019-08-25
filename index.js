@@ -154,7 +154,7 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId) {
             return ['BuschJaegerDoorLockAccessory', true];
         case 'B005':
         case 'B007':
-            return ['BuschJaegerBinarySensorAccessory', false];
+            return ['BuschJaegerBinarySensorAccessory', true];
         case 'doorbell':
             return ['BuschJaegerDoorBellAccessory', false];
         case 'videodoorbell':
