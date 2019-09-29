@@ -1,5 +1,5 @@
 [Install Homebridge]: https://github.com/nfarina/homebridge#installation
-[Install Busch-Jaeger API]: https://github.com/sstadlberger/home
+[Install free@home API]: https://github.com/henry-spanka/freeathome-api
 [Configuration]: #Configuration
 
 [sstadlberger]: https://github.com/sstadlberger
@@ -45,7 +45,8 @@ Homebridge platform plugin for Busch-Jaeger SmartHome devices.
 # Setup / Installation
 1. [Install Homebridge]
 2. `npm install homebridge-buschjaeger`
-3. [Install Busch-Jaeger API]
+3. [Install free@home API]
+    * Set the port for the websocket server to `8001`. The HTTP API can be disabled.
 4. Edit `config.json` and configure platform. See [Configuration](#configuration) section.
 5. Start Homebridge
 6. Star the repository ;)
@@ -109,7 +110,7 @@ To manage your accessories remotely you need to setup an iPad/Homepod or Apple T
 # Tips & Tricks
 * Do not restart Homebridge if you are either updating the SysAp or an actuator as the accessory may be removed from
 HomeKit if it is not detected during discovery.
-* If the HomeKit UI does not respond to manual changes (switch pressed) or the accessory doesn't update itself log into the System Access Point interface and log out again. This must be done sometimes after a reboot to enable websocket notifications.
+* ~~If the HomeKit UI does not respond to manual changes (switch pressed) or the accessory doesn't update itself log into the System Access Point interface and log out again. This must be done sometimes after a reboot to enable websocket notifications.~~
 
 # Changelog
 The changelog can be viewed [here](CHANGELOG.md).
@@ -126,6 +127,3 @@ your modifications.
 
 # License
 The project is subject to the MIT license unless otherwise noted. A copy can be found in the root directory of the project [LICENSE](LICENSE).
-
-# Thanks
-Special thanks to [sstadlberger] for his effort to make a custom API interface for Busch-Jaeger.
