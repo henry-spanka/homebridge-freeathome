@@ -231,8 +231,6 @@ BuschJaegerApPlatform.prototype.connect = function() {
     });
 
     this.ws.on('message', function incoming(data) {
-        that.log('Received a message from websocket');
-
         that.processMessage(data);
     });
 }
