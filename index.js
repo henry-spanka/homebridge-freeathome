@@ -148,6 +148,7 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId) {
             return ['BuschJaegerSchaltAktorAccessory', false];
         case '1021':
         case '101C':
+        case '1017':
             return ['BuschJaegerDimmAktorAccessory', false];
         case '0001':
             return ['BuschJaegerMediaPlayerAccessory', false];
