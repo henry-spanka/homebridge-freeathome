@@ -112,7 +112,7 @@ To manage your accessories remotely you need to setup an iPad/Homepod or Apple T
 # Tips & Tricks
 * Do not restart Homebridge if you are either updating the SysAp or an actuator as the accessory may be removed from
 HomeKit if it is not detected during discovery.
-* ~~If the HomeKit UI does not respond to manual changes (switch pressed) or the accessory doesn't update itself log into the System Access Point interface and log out again. This must be done sometimes after a reboot to enable websocket notifications.~~
+* If the HomeKit UI does not respond to manual changes (switch pressed) or the accessory doesn't update itself log into the System Access Point interface and log out again. This must be done sometimes after a reboot of the free@home SysAP to enable websocket notifications.
 
 # Changelog
 The changelog can be viewed [here](CHANGELOG.md).
