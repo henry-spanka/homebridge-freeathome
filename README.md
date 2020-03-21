@@ -23,6 +23,7 @@ Homebridge platform plugin for Busch-Jaeger SmartHome devices.
 - Dimmaktor 4-fach (1021)
 - Dimmaktor 4-fach (101C)
 - Sensor/Dimmaktor 1/1-fach (1017)
+- Sensor/Dimmaktor 2/1-fach (1019)
 - Raumtemperaturregler (1004)
 - Sensor/ Schaltaktor 1/1-fach (100C)
 - Sensor/ Schaltaktor 2/1-fach (100E)
