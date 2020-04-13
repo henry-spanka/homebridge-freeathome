@@ -1,3 +1,17 @@
+#### 1.7.0 (2020-04-13)
+
+##### Features
+
+* **Actuator:** Added support for:
+    - Sensor/ Schaltaktor 2/1-fach (100E)
+    - Sensor/Dimmaktor 1/1-fach (1017)
+    - Sensor/Dimmaktor 2/1-fach (1019)
+    - automatically set accessory name based on free@home device layout
+
+##### Improvements
+* **BuschJaegerDimmAktorAccessory**:
+    - limit minimum brightness based on free@home setting
+
 #### 1.6.0 (2019-07-17)
 
 ##### Features
