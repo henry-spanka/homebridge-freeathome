@@ -1,3 +1,10 @@
+#### 1.7.1 (2020-04-14)
+
+##### Features
+
+* **Actuator:** Added support for:
+    - Dimmaktor 4-fach (1022)
+
 #### 1.7.0 (2020-04-13)
 
 ##### Features
