@@ -4,7 +4,7 @@ const path = require('path');
 
 var Service, Characteristic, Hap, PlatformAccessory
 
-const WebSocket = require('ws');
+const API = require('freeathome-api');
 
 module.exports = function(homebridge) {
     console.log("homebridge API version: " + homebridge.version);
@@ -31,15 +31,11 @@ function BuschJaegerApPlatform(log, config, api) {
 
     this.log('Initialising BuschJaeger Plugin');
 
-    this.sysIP = config.sysIP;
-    this.updateInterval = config.updateInterval;
     this.mappings = config.mappings;
 
-    this.log('Will try to connect to the SysAP at %s', this.sysIP);
+    this.log('Will try to connect to the SysAP at %s', config.sysIP);
 
-    this.sysUrl = 'ws://' + this.sysIP + ':8001';
-
-    this.reconnecting = null;
+    this.configuration = new API.ClientConfiguration(config.sysIP, config.username, config.password);
 
     this.accessoryCallback = null;
     this.accessoryCallbackSet = false;
@@ -173,76 +169,50 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId) {
     }
 }
 
-BuschJaegerApPlatform.prototype.send = function(message) {
-    this.ws.send(message, function ack(error) {
-        if (error) {
-            this.log('Message could not be sent to the SysAp.');
-        }
-    }.bind(this));
+BuschJaegerApPlatform.prototype.setDatapoint = function(serial, channelNo, datapoint, value = null) {
+    this.api.setDatapoint(serial, channelNo, datapoint, value);
 }
 
-BuschJaegerApPlatform.prototype.connect = function() {
+BuschJaegerApPlatform.prototype.connect = async function() {
     this.log('Trying to connect to SysAP');
     const that = this;
 
-    if (this.ws) {
-        this.ws.removeAllListeners();
+    this.api = new API.SystemAccessPoint(this.configuration, this, class {
+        static log(...messages) {
+            for (let message of messages) {
+                that.log.info(message);
+            }
+        }
+
+        static warn(...messages) {
+            for (let message of messages) {
+                that.log.warn(message);
+            }
+        }
+
+        static error(...messages) {
+            for (let message of messages) {
+                that.log.error(message);
+            }
+        }
+
+        static debug(...messages) {
+            for (let message of messages) {
+                that.log.debug(message);
+            }
+        }
+    });
+
+    try {
+        await this.api.connect();
+    } catch(e) {
+        this.log.error(e.message);
     }
-
-    this.ws = new WebSocket(this.sysUrl);
-
-    this.ws.on('open', function open() {
-        that.log('Successfully connected to the SysAP');
-
-        let interval = 60;
-
-        if (that.updateInterval && that.updateInterval > 0) {
-            interval = that.updateInterval;
-        }
-
-        if (!that.scheduler) {
-            that.scheduler = setInterval(function() {
-                this.update();
-            }.bind(that), interval * 1000);
-        }
-
-        if (that.reconnecting) {
-            clearInterval(that.reconnecting);
-            that.reconnecting = null;
-        }
-
-        that.update();
-    });
-
-    this.ws.on('error', function error() {
-        that.log('Error while communicating with SysAp');
-    });
-
-    this.ws.on('close', function close() {
-        that.log('Disconnected from SysAP');
-
-        if (that.scheduler) {
-            clearInterval(that.scheduler);
-            that.scheduler = null;
-        }
-
-        if (!that.reconnecting) {
-            that.reconnecting = setInterval(function() {
-                this.connect();
-            }.bind(that), 10000);
-        }
-    });
-
-    this.ws.on('message', function incoming(data) {
-        that.processMessage(data);
-    });
 }
 
-BuschJaegerApPlatform.prototype.processMessage = function(message) {
-    let jsonData = JSON.parse(message);
-
+BuschJaegerApPlatform.prototype.processMessage = function(jsonData) {
     if (!('result' in jsonData)) {
-        this.log('Invalid message received.');
+        this.log.warn('Invalid message received.');
         return;
     }
 
@@ -257,7 +227,7 @@ BuschJaegerApPlatform.prototype.processMessage = function(message) {
     }
 
     if (this.accessoryCallbackSet && !isUpdate) {
-        this.transformAccessories(JSON.parse(message)['result']);
+        this.transformAccessories(jsonData['result']);
 
         /*
         There may be an edge case where the connection to the SysAP Node Plugin
@@ -273,10 +243,6 @@ BuschJaegerApPlatform.prototype.processMessage = function(message) {
             this.accessoryCallbackSet = false;
         }
     }
-}
-
-BuschJaegerApPlatform.prototype.update = function() {
-    this.send('info');
 }
 
 BuschJaegerApPlatform.prototype.processUpdate = function(actuators) {
@@ -319,4 +285,24 @@ BuschJaegerApPlatform.prototype.findAccessoryBySerial = function(sn, ch = null) 
     }
 
     return null;
+}
+
+BuschJaegerApPlatform.prototype.broadcastMessage = function(message) {
+    switch (message.type) {
+        case 'error':
+            this.log.error(message.result.message);
+            break;
+        case 'update':
+            this.processMessage(message);
+            break;
+        case 'subscribed':
+            if (message.result) {
+                this.processMessage({'type': 'result', 'result': this.api.getDeviceData()});
+            } else {
+                this.log.error("Unsubscribed from System Access Point!");
+            }
+            break;
+        default:
+            this.log.warn("Unknown message type received: " + message.type);
+    }
 }
