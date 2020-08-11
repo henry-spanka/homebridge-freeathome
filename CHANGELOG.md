@@ -1,3 +1,29 @@
+## 2.0.0 (2020-XX-XX)
+
+##### Features
+
+* Use freathome-api as a library
+* Automatically detect accessory type based on functionId
+* Expose Sonos speakers as speaker to HomeKit
+* Added support for smoke sensors
+* automatically detect light bulbs
+* renamed plugin
+
+##### Upgrade Notes
+To upgrade from `< 2.0.0` please follow below steps:
+
+1. Uninstall old Plugin `homebridge-buschjaeger`
+2. Install the new Plugin `homebridge-freeathome`
+3. Edit homebridge's `config.json`:
+    1. Change the platform `free@home`
+    2. Change the `SysIP` to the IP/Hostname of the System Access Point
+    3. Remove the `updateInterval` key if set
+    4. Remove any unnecessary mappings. Unused accessory will automatically be detected
+4. Start Homebridge
+
+Speakers need to be readded. Just add another accessory and they should show up as *Smart Speaker*.
+The `freeathome-api` can be stopped and uninstalled as it is not needed anymore.
+
 #### 1.7.1 (2020-04-14)
 
 ##### Features

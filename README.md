@@ -14,41 +14,34 @@ Homebridge platform plugin for free@home SmartHome devices.
 
 ![HomeKit UI](images/example_homekit_ui.png)
 
+**IMPORTANT:** If you upgrade from `< 2.0.0` please read the [Upgrade Notes](CHANGELOG.md) carefully before installing this plugin.
+
 # Features
 * Control your Busch-Jaeger Lights, Outlets, Blinds and more with Apple devices with Homekit
 * Setup automations with the HomeKit UI
 * Ask Siri to control your devices
 
-# Supported devices
-- Dimmaktor 4-fach (1021)
-- Dimmaktor 4-fach (1022)
-- Dimmaktor 4-fach (101C)
-- Sensor/Dimmaktor 1/1-fach (1017)
-- Sensor/Dimmaktor 2/1-fach (1019)
-- Raumtemperaturregler (1004)
-- Sensor/ Schaltaktor 1/1-fach (100C)
-- Sensor/ Schaltaktor 2/1-fach (100E)
-- Sensor/ Schaltaktor 2/2-fach (1010)
-- Sensor/ Schaltaktor 8/8fach, REG (B008)
-- Schaltaktor 4-fach, 16A, REG (B002)
-- Jalousieaktor 4-fach, REG (B001)
-- Sensor/ Jalousieaktor 2/1-fach (1015)
-- Sensor/ Jalousieaktor 1/1-fach (1013)
-- free@homeTouch 7 (1038) [Door Lock Only]
-- Sonos Media Player (0001)
+# Supported accessories
+- Binary Sensors
+- Outlets
+- Lights
+- Dimmable Lights
+- Thermostats
+- Door Locks
+- Media Players (Sonos)
+- Smoke Sensors
 
 # Custom Actuators
 - A switch actuator can be exposed as a (video) DoorBell.
 - A switch actuator can be exposed as a Garage Door.
 
 # Requirements
-* Busch-Jaeger Access Point
+* free@home Access Point
 * A linux-based server on your home network that runs 24/7 like a Raspberry Pi.
-* Busch-Jaeger API running
 
 # Setup / Installation
 1. [Install Homebridge]
-2. `npm install homebridge-buschjaeger`
+2. `npm install homebridge-freeathome`
 3. [Install free@home API]
     * Set the port for the websocket server to `8001`. The HTTP API can be disabled.
 4. Edit `config.json` and configure platform. See [Configuration](#configuration) section.
@@ -60,43 +53,35 @@ Homebridge platform plugin for free@home SmartHome devices.
 To configure the plugin add the following json in the platform section in `config.json`.
 ```json
 {
-    "platform": "BuschJaegerSysAp",
+    "platform": "free@home",
     "sysIP": "<IP>",
-    "updateInterval": 60,
     "mappings": {}
 }
 ```
 
-Replace `<IP>` with the IP where your Busch-Jaeger API is running (NOT the IP of the System Access Point). `localhost` or `127.0.0.1` is fine if it's running on the same server.
+Replace `<IP>` with the IP of your System Access Point.
 
-You can configure the *mappings* if you want to ignore an actuator or channel if they are not connected/unused to hide them from the HomeKit UI.
+You can configure the *mappings* if you want to ignore an actuator or channel if they are not connected/unused to hide them from the HomeKit UI. However this is only needed in rare cases. Usually you can leave this blank.
 
 ```json
 {
-    "platform": "BuschJaegerSysAp",
+    "platform": "free@home",
     "sysIP": "<IP>",
-    "updateInterval": 60,
     "mappings": {
         "<ACTUATOR-SERIAL>": {
             "blacklist": ["ch0000", "ch0001"],
         },
         "<ACTUATOR-SERIAL>": {
             "blacklist": ["*"],
-        },
-        "<ACTUATOR-SERIAL>": {
-            "whitelist": ["ch0010"] # Only for Door Lock - free@homeTouch 7 at the moment.
         }
-
     }
 }
 ```
 
-You can find the actuator serial in the web interface of the Busch-Jaeger SysAp Interface.
-
-Some actuators (like Door Lock - free@homeTouch 7) require the channel to be explicitly whitelisted.
+You can find the actuator serial in the web interface of the free@home SysAp Interface.
 
 ## (Video) DoorBell
-See the [DoorBell Tutorial](docs/DoorBellTutorial.md) on how to setup the BuschJaeger DoorBell in HomeKit.
+See the [DoorBell Tutorial](docs/DoorBellTutorial.md) on how to setup the free@home DoorBell in HomeKit.
 
 ## Garage Door
 See the [GarageDoor Tutorial](docs/GarageDoorTutorial.md) on how to expose a Switch actuator as a GarageDoor accessory.
@@ -128,6 +113,9 @@ If you have any questions or help please open an issue on the GitHub project pag
 # Contributing
 Pull requests are always welcome. If you have a device that is not supported yet please open an issue or open a pull request with
 your modifications.
+
+# Donation
+If you find my work useful you can support the ongoing development of this project by buying me a [cup of coffee](https://www.paypal.me/Hspanka)
 
 # License
 The project is subject to the MIT license unless otherwise noted. A copy can be found in the root directory of the project [LICENSE](LICENSE).
