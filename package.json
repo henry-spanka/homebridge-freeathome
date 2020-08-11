@@ -1,30 +1,31 @@
 {
-    "name": "homebridge-buschjaeger",
+    "name": "homebridge-freeathome",
     "version": "1.7.1",
-    "description": "Platform Plugin to manage busch-jaeger accessories via HomeBridge",
+    "description": "Platform Plugin to manage free@home accessories via HomeBridge",
     "license": "MIT",
     "keywords": [
         "homebridge-plugin",
         "buschjaeger",
-        "busch-jaeger"
+        "busch-jaeger",
+        "free@home",
+        "freeathome"
     ],
     "repository": {
         "type": "git",
-        "url": "git://github.com/henry-spanka/homebridge-buschjaeger.git"
+        "url": "git://github.com/henry-spanka/homebridge-freeathome.git"
     },
     "bugs": {
-        "url": "https://github.com/henry-spanka/homebridge-buschjaeger/issues"
+        "url": "https://github.com/henry-spanka/homebridge-freeathome/issues"
     },
     "engines": {
-        "node": ">=0.12.0",
-        "homebridge": ">=0.2.0"
+        "node": ">=10",
+        "homebridge": ">=1.1.1"
     },
     "dependencies": {
         "extend": "^3.0.0",
         "freeathome-api": "^1.1.1",
         "ip": "^1.1.3",
         "node-persist": "2.0.x",
-        "npm": "^5.7.1",
-        "ws": "^4.1.0"
+        "npm": "^6.14.6"
     }
 }

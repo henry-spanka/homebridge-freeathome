@@ -17,7 +17,8 @@ module.exports = function(homebridge) {
 
     // For platform plugin to be considered as dynamic platform plugin,
     // registerPlatform(pluginName, platformName, constructor, dynamic), dynamic must be true
-    homebridge.registerPlatform("homebridge-buschjaeger", "BuschJaegerSysAp", BuschJaegerApPlatform);
+    homebridge.registerPlatform("homebridge-freeathome", "free@home", BuschJaegerApPlatform);
+    homebridge.registerPlatform("homebridge-freeathome", "BuschJaegerSysAp", BuschJaegerApPlatform); // deprecated
 }
 
 // Platform constructor

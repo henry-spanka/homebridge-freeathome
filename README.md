@@ -6,11 +6,11 @@
 [Home Hub]: https://support.apple.com/en-us/HT207057
 
 
-# Homebridge-Buschjaeger
+# homebridge-freeathome
 
-Homebridge platform plugin for Busch-Jaeger SmartHome devices.
+Homebridge platform plugin for free@home SmartHome devices.
 
-[![NPM](https://nodei.co/npm/homebridge-buschjaeger.png?compact=true)](https://npmjs.org/package/homebridge-buschjaeger)
+[![NPM](https://nodei.co/npm/homebridge-freeathome.png?compact=true)](https://npmjs.org/package/homebridge-freeathome)
 
 ![HomeKit UI](images/example_homekit_ui.png)
 
