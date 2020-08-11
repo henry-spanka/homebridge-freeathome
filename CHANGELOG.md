@@ -15,7 +15,7 @@ To upgrade from `< 2.0.0` please follow below steps:
 1. Uninstall old Plugin `homebridge-buschjaeger`
 2. Install the new Plugin `homebridge-freeathome`
 3. Edit homebridge's `config.json`:
-    1. Change the platform `free@home`
+    1. Change the platform to `free@home`
     2. Change the `SysIP` to the IP/Hostname of the System Access Point
     3. Set the `username` and `password` previously used for the `freeathome-api`
     4. Remove the `updateInterval` option if set
