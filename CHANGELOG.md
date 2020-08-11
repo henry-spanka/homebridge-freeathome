@@ -17,8 +17,9 @@ To upgrade from `< 2.0.0` please follow below steps:
 3. Edit homebridge's `config.json`:
     1. Change the platform `free@home`
     2. Change the `SysIP` to the IP/Hostname of the System Access Point
-    3. Remove the `updateInterval` key if set
-    4. Remove any unnecessary mappings. Unused accessory will automatically be detected
+    3. Set the `username` and `password` previously used for the `freeathome-api`
+    4. Remove the `updateInterval` option if set
+    5. Remove any unnecessary mappings. Unused accessory will automatically be detected
 4. Start Homebridge
 
 Speakers need to be readded. Just add another accessory and they should show up as *Smart Speaker*.

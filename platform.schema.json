@@ -1,0 +1,44 @@
+{
+    "plugin_alias": "free@home",
+    "schema": {
+        "type": "object",
+        "properties": {
+            "platform": {
+                "title": "Platform",
+                "type": "string",
+                "const": "free@home",
+                "readOnly": true
+            },
+            "name": {
+                "title": "Name",
+                "type": "string",
+                "const": "free@home",
+                "readOnly": true
+            },
+            "sysIP": {
+                "title": "IP/Hostname",
+                "type": "string",
+                "required": true
+            },
+            "username": {
+                "title": "Username",
+                "type": "string",
+                "required": true
+            },
+            "password": {
+                "title": "Password",
+                "type": "string",
+                "required": true,
+                "options": {
+                    "hidden": true
+                }
+            },
+            "mappings": {
+                "title": "Custom Mappings",
+                "type": "object",
+                "required": false,
+                "default": {}
+            }
+        }
+    }
+}

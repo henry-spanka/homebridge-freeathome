@@ -8,7 +8,14 @@
         "buschjaeger",
         "busch-jaeger",
         "free@home",
-        "freeathome"
+        "freeathome",
+        "category-climate",
+        "category-lighting",
+        "category-video",
+        "category-security",
+        "category-media",
+        "hoobs-plugin",
+        "hoobs"
     ],
     "repository": {
         "type": "git",

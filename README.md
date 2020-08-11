@@ -5,7 +5,6 @@
 [sstadlberger]: https://github.com/sstadlberger
 [Home Hub]: https://support.apple.com/en-us/HT207057
 
-
 # homebridge-freeathome
 
 Homebridge platform plugin for free@home SmartHome devices.
@@ -53,6 +52,8 @@ To configure the plugin add the following json in the platform section in `confi
 {
     "platform": "free@home",
     "sysIP": "<IP>",
+    "username": "<USERNAME>",
+    "password": "<PASSWORD>",
     "mappings": {}
 }
 ```
@@ -65,6 +66,8 @@ You can configure the *mappings* if you want to ignore an actuator or channel if
 {
     "platform": "free@home",
     "sysIP": "<IP>",
+    "username": "<USERNAME>",
+    "password": "<PASSWORD>",
     "mappings": {
         "<ACTUATOR-SERIAL>": {
             "blacklist": ["ch0000", "ch0001"],
