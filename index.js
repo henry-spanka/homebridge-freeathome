@@ -137,6 +137,8 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId, channel, 
             return ['BuschJaegerDoorLockAccessory', false];
         case '5a':
             return ['BuschJaegerMediaPlayerAccessory', false];
+        case '7d':
+            return ['BuschJaegerSmokeSensorAccessory', false];
 
         default:
             return [null, false];
