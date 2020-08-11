@@ -42,11 +42,9 @@ Homebridge platform plugin for free@home SmartHome devices.
 # Setup / Installation
 1. [Install Homebridge]
 2. `npm install homebridge-freeathome`
-3. [Install free@home API]
-    * Set the port for the websocket server to `8001`. The HTTP API can be disabled.
-4. Edit `config.json` and configure platform. See [Configuration](#configuration) section.
-5. Start Homebridge
-6. Star the repository ;)
+3. Edit `config.json` and configure platform. See [Configuration](#configuration) section.
+4. Start Homebridge
+5. Star the repository ;)
 
 # Configuration
 
