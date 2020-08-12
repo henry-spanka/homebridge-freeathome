@@ -135,6 +135,8 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId, channel, 
             return ['BuschJaegerMotionSensorAccessory', false];
         case '12':
             return ['BuschJaegerDimmAktorAccessory', false];
+        case 'f':
+            return ['BuschJaegerContactSensorAccessory', false];
         case '23':
             return ['BuschJaegerThermostatAccessory', false];
         case '1a':
