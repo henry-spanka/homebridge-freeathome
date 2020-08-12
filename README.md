@@ -29,6 +29,9 @@ Homebridge platform plugin for free@home SmartHome devices.
 - Door Locks
 - Media Players (Sonos)
 - Smoke Sensors
+- Blinds / Shutters
+- Window Contact Sensors
+- Motion Sensors
 
 # Custom Actuators
 - A switch actuator can be exposed as a (video) DoorBell.

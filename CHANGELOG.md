@@ -1,3 +1,11 @@
+### 2.0.1 (2020-08-12)
+
+##### Features
+
+* Added support for shutters
+* Added support for motion sensors
++ Added support for window contact sensors
+
 ## 2.0.0 (2020-08-11)
 
 ##### Features
