@@ -131,6 +131,8 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId, channel, 
         case '9':
         case '61':
             return ['BuschJaegerJalousieAccessory', false];
+        case '11':
+            return ['BuschJaegerMotionSensorAccessory', false];
         case '12':
             return ['BuschJaegerDimmAktorAccessory', false];
         case '23':
