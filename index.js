@@ -152,6 +152,10 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId, channel, 
 }
 
 BuschJaegerApPlatform.prototype.setDatapoint = function(serial, channelNo, datapoint, value = null) {
+    if ('debug' in this.config && this.config.debug) {
+        this.log.warn("setDatapoint(): " + [serial, channelNo, datapoint, value.toString()].join('/'));
+    }
+
     this.api.setDatapoint(serial, channelNo, datapoint, value.toString());
 }
 
@@ -193,6 +197,10 @@ BuschJaegerApPlatform.prototype.connect = async function() {
 }
 
 BuschJaegerApPlatform.prototype.processMessage = function(jsonData) {
+    if ('debug' in this.config && this.config.debug) {
+        this.log.warn("processMessage(): " + JSON.stringify(jsonData));
+    }
+
     if (!('result' in jsonData)) {
         this.log.warn('Invalid message received.');
         return;

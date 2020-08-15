@@ -33,6 +33,12 @@
                     "hidden": true
                 }
             },
+            "debug": {
+                "title": "Log Debug data",
+                "type": "bool",
+                "required": false,
+                "default": false
+            },
             "mappings": {
                 "title": "Custom Mappings",
                 "type": "object",
