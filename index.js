@@ -77,26 +77,17 @@ BuschJaegerApPlatform.prototype.transformAccessories = function(actuators) {
             for (let channelNo in actuator['channels']) {
                 let channel = actuator['channels'][channelNo];
 
-                if ('blacklist' in mapping && mapping['blacklist'].includes(channelNo)) {
-                    this.log('Ignoring blacklisted accessory ' + actuator['typeName'] + '/' + channel['displayName'] + ' with serial ' + serial + ' and channel ' + channelNo);
-                    continue;
+                let accessory = this.initializeAccessory(channelNo, actuator, channel, serial, mapping);
+
+                if (accessory != null) {
+                    acc.push(accessory);
                 }
+            }
+        // some actuators do not expose their channels
+        } else {
+            let accessory = this.initializeAccessory(null, actuator, {}, serial, mapping);
 
-                let [accessoryClass, requireWhitelisted] = this.getAccessoryClass(actuator['deviceId'], channelNo, channel['functionId'], channel['iconId'], channel['floor'], channel['room'], mapping);
-
-                if (accessoryClass == null) {
-                    this.log.debug('Ignoring non-supported accessory ' + actuator['typeName'] + '/' + channel['displayName'] + ' with serial ' + serial + ' and channel ' + channelNo);
-                    continue;
-                }
-
-                if (requireWhitelisted && (!('whitelist' in mapping) || !mapping['whitelist'].includes(channel))) {
-                    this.log('Ignoring non-whitelisted accessory ' + actuator['typeName'] + '/' + channel['displayName'] + ' with serial ' + serial + ' and channel ' + channelNo);
-                    continue;
-                }
-
-                let service = require(path.join(__dirname, 'lib', accessoryClass));
-                let accessory = new service(this, Service, Characteristic, actuator, channelNo, mapping);
-
+            if (accessory != null) {
                 acc.push(accessory);
             }
         }
@@ -106,48 +97,82 @@ BuschJaegerApPlatform.prototype.transformAccessories = function(actuators) {
 
 }
 
+BuschJaegerApPlatform.prototype.initializeAccessory = function(channelNo, actuator, channel, serial, mapping) {
+    let [accessoryClass, forcedChannel] = this.getAccessoryClass(actuator['deviceId'], channelNo, channel['functionId'], channel['iconId'], channel['floor'], channel['room'], mapping);
+
+    if (channelNo == null) {
+        channelNo = forcedChannel;
+    }
+
+    if ('blacklist' in mapping && mapping['blacklist'].includes(channelNo)) {
+        this.log('Ignoring blacklisted accessory ' + actuator['typeName'] + '/' + channel['displayName'] + ' with serial ' + serial + ' and channel ' + channelNo);
+        return;
+    }
+
+    if (accessoryClass == null) {
+        this.log.debug('Ignoring non-supported accessory ' + actuator['typeName'] + '/' + channel['displayName'] + ' with serial ' + serial + ' and channel ' + channelNo);
+        return;
+    }
+
+    if (channelNo != null) {
+        let service = require(path.join(__dirname, 'lib', accessoryClass));
+
+        return new service(this, Service, Characteristic, actuator, channelNo, mapping);
+    }
+}
+
 BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId, channel, functionId, iconId, floor, room, mapping) {
-    if (!iconId || !floor || !room) {
-        return [null, false];
+    if (!floor || !room) {
+        return [null, null];
+    }
+
+    switch (deviceId) {
+        case '1008': // Bewegungsmelder
+        case '100A': // Bewegungsmelder/Schaltaktor 1-fach
+        return ['BuschJaegerMotionSensorAccessory', 'ch0000'];
+    }
+
+    if (!iconId) {
+        return [null, null];
     }
 
     if ('doorbell' in mapping && channel in mapping['doorbell']) {
         let doorbell = mapping['doorbell'][channel];
 
         if (doorbell['video']) {
-            return ['BuschJaegerVideoDoorBellAccessory', false];
+            return ['BuschJaegerVideoDoorBellAccessory', null];
         } else {
-            return ['BuschJaegerDoorBellAccessory', false];
+            return ['BuschJaegerDoorBellAccessory', null];
         }
     }  else if ('garagedoor' in mapping && channel in mapping['garagedoor']) {
-        return ['BuschJaegerGarageDoorAccessory', false];
+        return ['BuschJaegerGarageDoorAccessory', null];
     }
 
     switch (functionId) {
         case '4':
-            return ['BuschJaegerBinarySensorAccessory', false];
+            return ['BuschJaegerBinarySensorAccessory', null];
         case '7':
-            return ['BuschJaegerSchaltAktorAccessory', false];
+            return ['BuschJaegerSchaltAktorAccessory', null];
         case '9':
         case '61':
-            return ['BuschJaegerJalousieAccessory', false];
+            return ['BuschJaegerJalousieAccessory', null];
         case '11':
-            return ['BuschJaegerMotionSensorAccessory', false];
+            return ['BuschJaegerMotionSensorAccessory', null];
         case '12':
-            return ['BuschJaegerDimmAktorAccessory', false];
+            return ['BuschJaegerDimmAktorAccessory', null];
         case 'f':
-            return ['BuschJaegerContactSensorAccessory', false];
+            return ['BuschJaegerContactSensorAccessory', null];
         case '23':
-            return ['BuschJaegerThermostatAccessory', false];
+            return ['BuschJaegerThermostatAccessory', null];
         case '1a':
-            return ['BuschJaegerDoorLockAccessory', false];
+            return ['BuschJaegerDoorLockAccessory', null];
         case '5a':
-            return ['BuschJaegerMediaPlayerAccessory', false];
+            return ['BuschJaegerMediaPlayerAccessory', null];
         case '7d':
-            return ['BuschJaegerSmokeSensorAccessory', false];
+            return ['BuschJaegerSmokeSensorAccessory', null];
 
         default:
-            return [null, false];
+            return [null, null];
     }
 }
 
