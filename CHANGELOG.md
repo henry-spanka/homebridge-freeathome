@@ -1,3 +1,9 @@
+### 2.0.2 (2020-08-16)
+
+* Correctly expose motion sensors
+* Add debug option to log requests from/to SysAP
+* Fix contact sensor state inverted
+
 ### 2.0.1 (2020-08-12)
 
 ##### Features
