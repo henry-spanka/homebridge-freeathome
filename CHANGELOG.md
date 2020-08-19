@@ -1,3 +1,7 @@
+### 2.0.3 (2020-08-19)
+
+* Fix issue which would prevent accessories from reading correct datapoint values
+
 ### 2.0.2 (2020-08-16)
 
 * Correctly expose motion sensors
