@@ -14,7 +14,7 @@ function BuschJaegerAccessory(platform, Service, Characteristic, actuator, chann
     this.channel = channel ? this.removeChannelPrefix(channel) : null;
 
     if (this.channel) {
-        this.uuid_base = this.serial + 'ch' + this.channel;
+        this.uuid_base = this.serial + '/ch' + this.channel;
     } else {
         this.channel = '0000'
         this.uuid_base = this.serial;
@@ -64,8 +64,18 @@ BuschJaegerAccessory.prototype = {
     getValue: function(channelNo, datapoint) {
         let channel = 'ch' + channelNo;
 
-        if (channel in this.platform.actuatorInfo[this.serial]['channels'] && datapoint in this.platform.actuatorInfo[this.serial]['channels'][channel]['datapoints']) {
-            return this.platform.actuatorInfo[this.serial]['channels'][channel]['datapoints'][datapoint];
+        if (channel in this.platform.actuatorInfo[this.serial]['channels']) {
+            let ach = this.platform.actuatorInfo[this.serial]['channels'][channel]
+            if(ach['datapoints'] && datapoint in ach['datapoints']) {
+                return ach['datapoints'][datapoint];
+            }else
+            if(ach['outputs'] && datapoint in ach['outputs']) {
+                return ach['outputs'][datapoint].value;
+            }else
+            if(ach['inputs'] && datapoint in ach['inputs'].value) {
+                return ach['inputs'][datapoint];
+            }
+           
         }
         
         return null;
@@ -78,7 +88,7 @@ BuschJaegerAccessory.prototype = {
     },
 
     update: function(channel = null, datapoint, value = null) {
-        this.platform.log('Updating accessory ' + this.name + ' with uuid ' + this.uuid_base);
+        this.platform.log('Updating accessory *' + this.name + '* with uuid ' + this.uuid_base + "/" +datapoint + "/" + value.value);
 
         this.processPendingUpdates(channel, datapoint, value);
 
@@ -90,6 +100,7 @@ BuschJaegerAccessory.prototype = {
     },
 
     waitForUpdate: function(callback, channel, datapoint, value = null, timeout = 5) {
+        var self = this
         this.pendingUpdates.push({
             'channel': channel,
             'datapoint': datapoint,
@@ -99,8 +110,11 @@ BuschJaegerAccessory.prototype = {
         });
 
         if (timeout > 0) {
-            setTimeout(() => {
-                this.processPendingUpdates(channel, datapoint, value, true);
+            setTimeout(function () {
+                // We don't need the timeout on local API, in the future a reinit of any disconnected WS session might be more stable
+                if(!self.platform.config.isLocalAPI) {
+                    self.processPendingUpdates(channel, datapoint, value, true);
+                }
             }, timeout * 1000);
         }
     },
@@ -110,26 +124,13 @@ BuschJaegerAccessory.prototype = {
             let update = this.pendingUpdates[i];
             if ((update['channel'] && update['channel'] == channel) || (update['channel'] === null && channel === null)) {
                 if (update['datapoint'] == datapoint) {
-                    if (update['value'] === null) {
+                    if (update['value'] === null || update['value'] == value) {
                         if (!update['persist']) {
                             this.pendingUpdates.splice(i, 1);
                         }
 
                         if (error) {
-                            update['callback']("SysAp did not respond in time.");
-                            this.platform.log("SysAp did not respond in time: " + [channel, datapoint, value].join('/'));
-                            this.platform.log("If this issue persists please try to login as the API user in the free@home UI. The SysAp might disable websocket notifications if the connection is idle for too long.");
-                            this.platform.log("See: https://github.com/henry-spanka/homebridge-freeathome#tips--tricks");
-                        } else {
-                            update['callback'](null, value);
-                        }
-                    } else if (update['value'] == value) {
-                        if (!update['persist']) {
-                            this.pendingUpdates.splice(i, 1);
-                        }
-
-                        if (error) {
-                            update['callback']("SysAp did not respond in time.");
+                            update['callback']("SysAp did not respond in time...");
                             this.platform.log("SysAp did not respond in time: " + [channel, datapoint, value].join('/'));
                             this.platform.log("If this issue persists please try to login as the API user in the free@home UI. The SysAp might disable websocket notifications if the connection is idle for too long.");
                             this.platform.log("See: https://github.com/henry-spanka/homebridge-freeathome#tips--tricks");

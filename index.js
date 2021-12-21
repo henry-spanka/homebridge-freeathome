@@ -4,9 +4,12 @@ const path = require('path');
 
 var Service, Characteristic, Hap, PlatformAccessory
 
-const API = require('freeathome-api');
+var APICLOUD = require('freeathome-api');
+var APILOCAL = require(path.join(__dirname, 'dist', 'local-api'));
+//var APILOCAL;
+var API;
 
-module.exports = function(homebridge) {
+module.exports = function (homebridge) {
     console.log("homebridge API version: " + homebridge.version);
 
     // Service and Characteristic are from hap-nodejs
@@ -17,8 +20,8 @@ module.exports = function(homebridge) {
 
     // For platform plugin to be considered as dynamic platform plugin,
     // registerPlatform(pluginName, platformName, constructor, dynamic), dynamic must be true
-    homebridge.registerPlatform("homebridge-freeathome", "free@home", BuschJaegerApPlatform);
-    homebridge.registerPlatform("homebridge-freeathome", "BuschJaegerSysAp", BuschJaegerApPlatform); // deprecated
+    homebridge.registerPlatform("homebridge-freeathome", "free@home", BuschJaegerApPlatform, true);
+    homebridge.registerPlatform("homebridge-freeathome", "BuschJaegerSysAp", BuschJaegerApPlatform, true); // deprecated
 }
 
 // Platform constructor
@@ -36,6 +39,12 @@ function BuschJaegerApPlatform(log, config, api) {
 
     this.log('Will try to connect to the SysAP at %s', config.sysIP);
 
+    if (config.isLocalAPI == true) {
+        API = APILOCAL;
+    } else {
+        API = APICLOUD;
+    }
+
     this.configuration = new API.ClientConfiguration(config.sysIP, config.username, config.password);
 
     this.accessoryCallback = null;
@@ -52,12 +61,12 @@ function BuschJaegerApPlatform(log, config, api) {
     this.config = config;
 }
 
-BuschJaegerApPlatform.prototype.accessories = function(callback) {
+BuschJaegerApPlatform.prototype.accessories = function (callback) {
     this.accessoryCallback = callback;
     this.accessoryCallbackSet = true;
 }
 
-BuschJaegerApPlatform.prototype.transformAccessories = function(actuators) {
+BuschJaegerApPlatform.prototype.transformAccessories = function (actuators) {
     let acc = [];
 
     for (let serial in actuators) {
@@ -83,7 +92,7 @@ BuschJaegerApPlatform.prototype.transformAccessories = function(actuators) {
                     acc.push(accessory);
                 }
             }
-        // some actuators do not expose their channels
+            // some actuators do not expose their channels
         } else {
             let accessory = this.initializeAccessory(null, actuator, {}, serial, mapping);
 
@@ -97,8 +106,11 @@ BuschJaegerApPlatform.prototype.transformAccessories = function(actuators) {
 
 }
 
-BuschJaegerApPlatform.prototype.initializeAccessory = function(channelNo, actuator, channel, serial, mapping) {
-    let [accessoryClass, forcedChannel] = this.getAccessoryClass(actuator['deviceId'], channelNo, channel['functionId'], channel['iconId'], channel['floor'], channel['room'], mapping);
+BuschJaegerApPlatform.prototype.initializeAccessory = function (channelNo, actuator, channel, serial, mapping) {
+
+    actuator['serialNumber'] = serial;  // local API
+    actuator['typeName'] = actuator['typeName'] ?? actuator['displayName'];
+    let [accessoryClass, forcedChannel] = this.getAccessoryClass(actuator['deviceId'], channelNo, channel['functionId'] ?? channel['functionID'], channel['iconId'], channel['floor'] ?? actuator['floor'], channel['room'] ?? actuator['room'], mapping);
 
     if (channelNo == null) {
         channelNo = forcedChannel;
@@ -115,13 +127,13 @@ BuschJaegerApPlatform.prototype.initializeAccessory = function(channelNo, actuat
     }
 
     if (channelNo != null) {
-        let service = require(path.join(__dirname, 'lib', accessoryClass));
+        let service = require(path.join(__dirname, 'dist/accessories', accessoryClass));
 
         return new service(this, Service, Characteristic, actuator, channelNo, mapping);
     }
 }
 
-BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId, channel, functionId, iconId, floor, room, mapping) {
+BuschJaegerApPlatform.prototype.getAccessoryClass = function (deviceId, channel, functionId, iconId, floor, room, mapping) {
     if (!floor || !room) {
         return [null, null];
     }
@@ -129,11 +141,11 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId, channel, 
     switch (deviceId) {
         case '1008': // Bewegungsmelder
         case '100A': // Bewegungsmelder/Schaltaktor 1-fach
-        return ['BuschJaegerMotionSensorAccessory', 'ch0000'];
+            return ['BuschJaegerMotionSensorAccessory', 'ch0000'];
     }
 
     if (!iconId) {
-        return [null, null];
+        //return [null, null];
     }
 
     if ('doorbell' in mapping && channel in mapping['doorbell']) {
@@ -144,7 +156,7 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId, channel, 
         } else {
             return ['BuschJaegerDoorBellAccessory', null];
         }
-    }  else if ('garagedoor' in mapping && channel in mapping['garagedoor']) {
+    } else if ('garagedoor' in mapping && channel in mapping['garagedoor']) {
         return ['BuschJaegerGarageDoorAccessory', null];
     }
 
@@ -176,7 +188,7 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function(deviceId, channel, 
     }
 }
 
-BuschJaegerApPlatform.prototype.setDatapoint = function(serial, channelNo, datapoint, value = null) {
+BuschJaegerApPlatform.prototype.setDatapoint = function (serial, channelNo, datapoint, value = null) {
     if ('debug' in this.config && this.config.debug) {
         this.log.warn("setDatapoint(): " + [serial, channelNo, datapoint, value.toString()].join('/'));
     }
@@ -184,7 +196,7 @@ BuschJaegerApPlatform.prototype.setDatapoint = function(serial, channelNo, datap
     this.api.setDatapoint(serial, channelNo, datapoint, value.toString());
 }
 
-BuschJaegerApPlatform.prototype.connect = async function() {
+BuschJaegerApPlatform.prototype.connect = async function () {
     this.log('Trying to connect to SysAP');
     const that = this;
 
@@ -216,12 +228,12 @@ BuschJaegerApPlatform.prototype.connect = async function() {
 
     try {
         await this.api.connect();
-    } catch(e) {
+    } catch (e) {
         this.log.error(e.message);
     }
 }
 
-BuschJaegerApPlatform.prototype.processMessage = function(jsonData) {
+BuschJaegerApPlatform.prototype.processMessage = function (jsonData) {
     if ('debug' in this.config && this.config.debug) {
         this.log.warn("processMessage(): " + JSON.stringify(jsonData));
     }
@@ -260,26 +272,41 @@ BuschJaegerApPlatform.prototype.processMessage = function(jsonData) {
     }
 }
 
-BuschJaegerApPlatform.prototype.processUpdate = function(actuators) {
+BuschJaegerApPlatform.prototype.processUpdate = function (actuators) {
     for (let serial in actuators) {
         for (let channel in actuators[serial]['channels']) {
             let channels = actuators[serial]['channels'][channel];
-            for (let datapoint in channels['datapoints']) {
-                if (this.actuatorInfo[serial]) {
+            if (this.actuatorInfo[serial]) {
+                for (let datapoint in channels['datapoints']) {
+
                     if (!this.actuatorInfo[serial]['channels'][channel]) {
-                        this.actuatorInfo[serial]['channels'][channel] = {'datapoints': {}};
+                        this.actuatorInfo[serial]['channels'][channel] = { 'datapoints': {} };
                     }
 
                     let value = channels['datapoints'][datapoint];
                     this.actuatorInfo[serial]['channels'][channel]['datapoints'][datapoint] = value;
-                    this.sendUpdateToAccessory(serial, channel.replace('ch',''), datapoint, value);
+                    this.sendUpdateToAccessory(serial, channel.replace('ch', ''), datapoint, value);
+                }
+                for (let datapoint in channels['outputs']) {
+                    let value = channels['outputs'][datapoint];
+                    // value is somehow a referenz to *['outputs'][datapoint] so we don't need to assign it here
+                    //this.actuatorInfo[serial]['channels'][channel]['outputs'][datapoint] = value;
+                    this.sendUpdateToAccessory(serial, channel.replace('ch', ''), datapoint, value);
+                    
+                }
+                for (let datapoint in channels['inputs']) {
+                    let value = channels['inputs'][datapoint];      
+                    // value is somehow a referenz to *['outputs'][datapoint] so we don't need to assign it here              
+                    //this.actuatorInfo[serial]['channels'][channel]['inputs'][datapoint] = value;
+                    this.sendUpdateToAccessory(serial, channel.replace('ch', ''), datapoint, value);
+                    
                 }
             }
         }
     }
 }
 
-BuschJaegerApPlatform.prototype.sendUpdateToAccessory = function(serial, channel, datapoint, value = null) {
+BuschJaegerApPlatform.prototype.sendUpdateToAccessory = function (serial, channel, datapoint, value = null) {
     let accessory = this.findAccessoryBySerial(serial, channel);
 
     if (accessory) {
@@ -287,7 +314,7 @@ BuschJaegerApPlatform.prototype.sendUpdateToAccessory = function(serial, channel
     }
 }
 
-BuschJaegerApPlatform.prototype.findAccessoryBySerial = function(sn, ch = null) {
+BuschJaegerApPlatform.prototype.findAccessoryBySerial = function (sn, ch = null) {
     for (let i = 0; i < this.foundAccessories.length; i++) {
         if (this.foundAccessories[i].serial == sn) {
             if (!ch && !this.foundAccessories[i].channel) {
@@ -302,7 +329,7 @@ BuschJaegerApPlatform.prototype.findAccessoryBySerial = function(sn, ch = null) 
     return null;
 }
 
-BuschJaegerApPlatform.prototype.broadcastMessage = function(message) {
+BuschJaegerApPlatform.prototype.broadcastMessage = function (message) {
     switch (message.type) {
         case 'error':
             this.log.error(message.result.message);
@@ -312,7 +339,7 @@ BuschJaegerApPlatform.prototype.broadcastMessage = function(message) {
             break;
         case 'subscribed':
             if (message.result) {
-                this.processMessage({'type': 'result', 'result': this.api.getDeviceData()});
+                this.processMessage({ 'type': 'result', 'result': this.api.getDeviceData() });
             } else {
                 this.log.error("Unsubscribed from System Access Point!");
             }
