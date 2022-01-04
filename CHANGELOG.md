@@ -1,3 +1,7 @@
+### 2.6.0 (2022-01-03)
+
+* Added experimental support for the local REST API (instead of the Jabber Cloud solution)
+
 ### 2.0.3 (2020-08-19)
 
 * Fix issue which would prevent accessories from reading correct datapoint values
@@ -40,7 +44,7 @@ To upgrade from `< 2.0.0` please follow below steps:
     5. Remove any unnecessary mappings. Unused accessory will automatically be detected
 4. Start Homebridge
 
-Speakers need to be readded. Just add another accessory and they should show up as *Smart Speaker*.
+Speakers need to be re-added. Just add another accessory and they should show up as *Smart Speaker*.
 The `freeathome-api` can be stopped and uninstalled as it is not needed anymore.
 
 #### 1.7.1 (2020-04-14)

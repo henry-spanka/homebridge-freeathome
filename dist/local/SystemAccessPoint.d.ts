@@ -15,12 +15,14 @@ export declare class SystemAccessPoint {
     private keepAliveTimer;
     private deviceData;
     private subscribed;
+    private axios;
     private logger;
     private readonly _protocol1;
     private readonly _protocol2;
-    private readonly _port;
+    private _port;
     private readonly _path2api;
-    private readonly _uuid;
+    private _uuid;
+    private readonly _minversionAP;
     constructor(configuration: ClientConfiguration, subscriber: Subscriber, logger: Logger | null);
     private createClient;
     private getSettings;

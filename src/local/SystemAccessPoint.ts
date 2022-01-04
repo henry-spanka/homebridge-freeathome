@@ -1,4 +1,4 @@
-import Axios from "axios"
+import axios, { Axios } from "axios"
 import compareVersions from "compare-versions"
 import FatHAPI from "freeathome-api"
 import { SystemAccessPointSettings, SystemAccessPointUser } from "freeathome-api/dist/lib/SystemAccessPointSettings"
@@ -8,14 +8,8 @@ import { Logger, ConsoleLogger } from "freeathome-api/dist/lib/Logger"
 import { General, Message, Result } from "freeathome-api/dist/lib/constants"
 import { GuardedClient } from './GuardedClient'
 import { MessageBuilder } from './MessageBuilder'
-/*
-export { SystemAccessPoint } from './lib/SystemAccessPoint';
-export { ClientConfiguration } from './lib/Configuration';
-export { ConsoleLogger, Logger } from './lib/Logger';
 
-http://192.168.9.40/fhapi/v1/api/ws
-
-*/
+const https = require('https');
 
 export class SystemAccessPoint {
     private configuration: ClientConfiguration
@@ -31,15 +25,34 @@ export class SystemAccessPoint {
     private keepAliveTimer: NodeJS.Timeout | null = null
     private deviceData: any = {}
     private subscribed: boolean = false
-
+    private axios: Axios
     private logger: Logger = new ConsoleLogger()
 
-    private readonly _protocol1 = 'ws://'
-    private readonly _protocol2 = 'http://'
-    private readonly _port = '80'
-    private readonly _path2api = '/fhapi/v1/api'
-    private readonly _uuid = '00000000-0000-0000-0000-000000000000'
+    /**
+     * protocols, we need some smarter way in the future (enableTLS: true in config)
+     */
+    private readonly _protocol1 = 'wss://'
+    private readonly _protocol2 = 'https://'
+    
+    /**
+     * ports will be set automagically (hopefully)
+     */
+    private _port = ''
 
+    /**
+     * the API entry path
+     */
+    private readonly _path2api = '/fhapi/v1/api'
+
+    /**
+     * default UUID - we will read the "real" uuid from config.json
+     */
+    private _uuid = '00000000-0000-0000-0000-000000000000'
+
+    /**
+     * minimal version to use the local API
+    */
+    private readonly _minversionAP = '2.6.0'
 
     constructor(configuration: ClientConfiguration, subscriber: Subscriber, logger: Logger | null) {
         this.configuration = configuration
@@ -47,6 +60,12 @@ export class SystemAccessPoint {
         if (logger !== undefined && logger !== null) {
             this.logger = logger
         }
+        // ignore self signed certs at instance level
+        this.axios = axios.create({
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false
+            })
+        });
     }
 
     private async createClient() {
@@ -71,29 +90,24 @@ export class SystemAccessPoint {
         let username = user!.jid.split('@')[0]
 
         /**
-         * private readonly _protocol = 'ws://'
-         * private readonly _port = '80'
+         * private readonly _protocol1 = 'wss://'
+         * private _port = ''
          * private readonly _path2api = '/fhapi/v1/api'
          */
         this.client = new GuardedClient(this.subscriber, {
-            service: this._protocol1 + this.configuration.hostname + ':' + this._port + this._path2api + '/ws',//':5280/xmpp-websocket',
+            service: this._protocol1 + this.configuration.hostname +  ((this._port!='')?':' + this._port:'') + this._path2api + '/ws',
             from: this.configuration.hostname,
             resource: 'freeathome-api',
             username: username,
             password: this.configuration.password
         }, this.logger)
 
-
-
-        //this.crypto = new Crypto(user!, this.configuration.password)
-
         this.messageBuilder = new MessageBuilder(username)
-
         this.registerHandlers()
     }
 
     private async getSettings(): Promise<SystemAccessPointSettings> {
-        let response = await Axios.get(this._protocol2 + this.configuration.hostname + '/settings.json')
+        let response = await this.axios.get(this._protocol2 + this.configuration.hostname + '/settings.json')
 
         if (response.status != 200) {
             this.logger.error("Unexpected status code from System Access Point while retrieving settings.json.")
@@ -117,7 +131,7 @@ export class SystemAccessPoint {
         let _restpath = '/rest/configuration'
         let bwaToken = this.client!.getBWAToken()
         try {
-            let response = await Axios.get(this._protocol2 + this.configuration.hostname + this._path2api + _restpath, {
+            let response = await this.axios.get(this._protocol2 + this.configuration.hostname + this._path2api + _restpath, {
                 headers: { 'Authorization': 'Basic ' + bwaToken }
             })
 
@@ -128,21 +142,10 @@ export class SystemAccessPoint {
 
 
             /**
-             * mapping outputs AND inputs to datapints to match the Cloud Data structure
+             * retrieving the uuid from device config
              */
+            this._uuid = Object.keys(response.data)[0] ?? this._uuid
             this.deviceData = response.data[this._uuid]?.devices
-            /*
-            for (let serial in this.deviceData) {
-                for (let channel in this.deviceData[serial]['channels']) {
-                    let channels = this.deviceData[serial]['channels'][channel];
-                    for (let outputs in channels['outputs']) {
-                        this.deviceData[serial]['channels'][channel] = { 'datapoints': outputs };
-                    }
-                    for (let inputs in channels['inputs']) {
-                        this.deviceData[serial]['channels'][channel] = { 'datapoints': inputs };
-                    }
-                }
-            }*/
 
             this.subscriber.broadcastMessage({ result: response.data, type: 'subscribed' })
             return response.data
@@ -194,7 +197,7 @@ export class SystemAccessPoint {
         })
 
         this.client.on('open', async address => {
-            let connectedAs = 'ws'
+            let connectedAs = 'local websocket'
             this.logger.log("Connected as " + connectedAs)
             this.connectedAs = connectedAs
 
@@ -243,7 +246,7 @@ export class SystemAccessPoint {
         // await this.client!.send(message)
         let bwaToken = this.client!.getBWAToken()
         try {
-            let response = await Axios.put(this._protocol2 + this.configuration.hostname + this._path2api + '/rest/datapoint/' + this._uuid + '/' + message,
+            let response = await this.axios.put(this._protocol2 + this.configuration.hostname + this._path2api + '/rest/datapoint/' + this._uuid + '/' + message,
                 value,
                 {
                     headers: { 'Authorization': 'Basic ' + bwaToken }
@@ -260,13 +263,15 @@ export class SystemAccessPoint {
         }
     }
 
+    /**
+     * create and connect WS client
+     */
     async connect() {
-        await this.createClient()
-        //await this.crypto!.ready()
-        //this.crypto!.generateKeypair()
 
-        if (compareVersions(this.settings!.flags.version, '2.3.1') < 0) {
-            throw Error('Your System Access Point\'s firmware must be at least 2.3.1');
+        await this.createClient()
+
+        if (compareVersions(this.settings!.flags.version, this._minversionAP) < 0) {
+            throw Error('Your System Access Point\'s firmware must be at least ' + this._minversionAP);
         }
 
         try {
@@ -309,7 +314,6 @@ export class SystemAccessPoint {
             const channelNo = update[1]
             const datapointNo = update[2]
             const value = update[3]
-            //this.logger.log("##### applyIncrementalUpdate: " + serialNo + '/' + channelNo + '/' + datapointNo + '/' + value)
             upd[serialNo] = Array();
 
             if (!(serialNo in this.deviceData)) {
@@ -322,8 +326,6 @@ export class SystemAccessPoint {
                 upd[serialNo]['typeName'] = this.deviceData[serialNo]['typeName']
             }
 
-
-
             if (channelNo != null) {
 
                 if (!(channelNo in this.deviceData[serialNo]['channels'])) {
@@ -334,28 +336,25 @@ export class SystemAccessPoint {
 
                 if (datapointNo != null) {
                     if (this.deviceData[serialNo]['channels'][channelNo]['datapoints'] != null) {
-                        // remote API
+                        // remote API can be removed here
                         this.deviceData[serialNo]['channels'][channelNo]['datapoints'][datapointNo] = value
-                    } else if (this.deviceData[serialNo]['channels'][channelNo]['outputs'][datapointNo] != null) {
-                        // local API outputs
-                        // this.deviceData[serialNo]['channels'][channelNo]['outputs'][datapointNo].value = value
+                    } else {
+                        let channelKey = ''
+                        if (this.deviceData[serialNo]['channels'][channelNo]['outputs'][datapointNo] != null) {
+                            channelKey = 'outputs'
+                        }else 
+                        if (this.deviceData[serialNo]['channels'][channelNo]['inputs'][datapointNo] != null) {
+                            channelKey = 'inputs'
+                        }
+                        // local API inputs & outputs - datapointNo csn oeitherr be in inputs or outputs
                         upd[serialNo]['channels'] = []
                         upd[serialNo]['channels'][channelNo] = []
-                        upd[serialNo]['channels'][channelNo]['outputs'] = []
-                        upd[serialNo]['channels'][channelNo]['outputs'][datapointNo] = this.deviceData[serialNo]['channels'][channelNo]['outputs'][datapointNo]
-                        upd[serialNo]['channels'][channelNo]['outputs'][datapointNo].value = value
+                        upd[serialNo]['channels'][channelNo][channelKey] = []
+                        upd[serialNo]['channels'][channelNo][channelKey][datapointNo] = this.deviceData[serialNo]['channels'][channelNo][channelKey][datapointNo]
+                        upd[serialNo]['channels'][channelNo][channelKey][datapointNo].value = value
 
-                    } else if (this.deviceData[serialNo]['channels'][channelNo]['inputs'][datapointNo] != null) {
-                        // local API inputs
-                        // this.deviceData[serialNo]['channels'][channelNo]['inputs'][datapointNo].value = value
-                        upd[serialNo]['channels'] = []
-                        upd[serialNo]['channels'][channelNo] = []
-                        upd[serialNo]['channels'][channelNo]['inputs'] = []
-                        upd[serialNo]['channels'][channelNo]['inputs'][datapointNo] = this.deviceData[serialNo]['channels'][channelNo]['inputs'][datapointNo]
-                        upd[serialNo]['channels'][channelNo]['inputs'][datapointNo].value = value
-
-                    }
-                    // upd[serialNo] = this.deviceData[serialNo]
+                    } 
+                   
                     // we need this in BuschJaegerApPlatform.prototype.processUpdate = function(actuators)
                     upd[serialNo]['serial'] = serialNo
                     this.logger.debug("Updated Datapoint: " + serialNo + '/' + channelNo + '/' + datapointNo + '/' + value)

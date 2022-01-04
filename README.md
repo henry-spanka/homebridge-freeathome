@@ -24,6 +24,7 @@ Homebridge platform plugin for free@home SmartHome devices.
 * Control your Busch-Jaeger Lights, Outlets, Blinds and more with Apple devices with Homekit
 * Setup automations with the HomeKit UI
 * Ask Siri to control your devices
+* Experimental Feature: Use Local REST API
 
 # Supported accessories
 - Binary Sensors
@@ -62,6 +63,7 @@ To configure the plugin add the following json in the platform section in `confi
     "sysIP": "<IP>",
     "username": "<USERNAME>",
     "password": "<PASSWORD>",
+    "isLocalAPI": <true|false>,
     "mappings": {}
 }
 ```
@@ -88,6 +90,20 @@ You can configure the *mappings* if you want to ignore an actuator or channel if
 ```
 
 You can find the actuator serial in the web interface of the free@home SysAp Interface.
+
+## Local REST API
+
+You need to activate local API settings in the SysAP settings of the free@home next App: https://developer.eu.mybuildings.abb.com/fah_local/prerequisites/ 
+
+This feature is NOT available in the web backend!
+
+You should activate SSH (TLS) support as well in Settings > Service in the App or backend.
+
+User/Password will be the same as for the Cloud API, the user "installer" seems to be the most reliable.
+
+In your config.json you need to set `"isLocalAPI": true,`
+
+That's it, good luck keeping your data at home!
 
 ## (Video) DoorBell
 See the [DoorBell Tutorial](docs/DoorBellTutorial.md) on how to setup the free@home DoorBell in HomeKit.

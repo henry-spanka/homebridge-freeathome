@@ -18,6 +18,7 @@ const compare_versions_1 = __importDefault(require("compare-versions"));
 const Logger_1 = require("freeathome-api/dist/lib/Logger");
 const GuardedClient_1 = require("./GuardedClient");
 const MessageBuilder_1 = require("./MessageBuilder");
+const https = require('https');
 class SystemAccessPoint {
     constructor(configuration, subscriber, logger) {
         this.online = false;
@@ -26,16 +27,22 @@ class SystemAccessPoint {
         this.deviceData = {};
         this.subscribed = false;
         this.logger = new Logger_1.ConsoleLogger();
-        this._protocol1 = 'ws://';
-        this._protocol2 = 'http://';
-        this._port = '80';
+        this._protocol1 = 'wss://';
+        this._protocol2 = 'https://';
+        this._port = '';
         this._path2api = '/fhapi/v1/api';
         this._uuid = '00000000-0000-0000-0000-000000000000';
+        this._minversionAP = '2.6.0';
         this.configuration = configuration;
         this.subscriber = subscriber;
         if (logger !== undefined && logger !== null) {
             this.logger = logger;
         }
+        this.axios = axios_1.default.create({
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false
+            })
+        });
     }
     createClient() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -54,7 +61,7 @@ class SystemAccessPoint {
             this.user = user;
             let username = user.jid.split('@')[0];
             this.client = new GuardedClient_1.GuardedClient(this.subscriber, {
-                service: this._protocol1 + this.configuration.hostname + ':' + this._port + this._path2api + '/ws',
+                service: this._protocol1 + this.configuration.hostname + ((this._port != '') ? ':' + this._port : '') + this._path2api + '/ws',
                 from: this.configuration.hostname,
                 resource: 'freeathome-api',
                 username: username,
@@ -66,7 +73,7 @@ class SystemAccessPoint {
     }
     getSettings() {
         return __awaiter(this, void 0, void 0, function* () {
-            let response = yield axios_1.default.get(this._protocol2 + this.configuration.hostname + '/settings.json');
+            let response = yield this.axios.get(this._protocol2 + this.configuration.hostname + '/settings.json');
             if (response.status != 200) {
                 this.logger.error("Unexpected status code from System Access Point while retrieving settings.json.");
                 throw new Error("Unexpected status code from System Access Point while retrieving settings.json.");
@@ -83,19 +90,20 @@ class SystemAccessPoint {
         });
     }
     getDeviceConfiguration() {
-        var _a;
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             let _restpath = '/rest/configuration';
             let bwaToken = this.client.getBWAToken();
             try {
-                let response = yield axios_1.default.get(this._protocol2 + this.configuration.hostname + this._path2api + _restpath, {
+                let response = yield this.axios.get(this._protocol2 + this.configuration.hostname + this._path2api + _restpath, {
                     headers: { 'Authorization': 'Basic ' + bwaToken }
                 });
                 if (response.status != 200) {
                     this.logger.error("Unexpected status code from System Access Point while retrieving " + _restpath);
                     throw new Error("Unexpected status code from System Access Point while retrieving " + _restpath);
                 }
-                this.deviceData = (_a = response.data[this._uuid]) === null || _a === void 0 ? void 0 : _a.devices;
+                this._uuid = (_a = Object.keys(response.data)[0]) !== null && _a !== void 0 ? _a : this._uuid;
+                this.deviceData = (_b = response.data[this._uuid]) === null || _b === void 0 ? void 0 : _b.devices;
                 this.subscriber.broadcastMessage({ result: response.data, type: 'subscribed' });
                 return response.data;
             }
@@ -135,7 +143,7 @@ class SystemAccessPoint {
             }
         }));
         this.client.on('open', (address) => __awaiter(this, void 0, void 0, function* () {
-            let connectedAs = 'ws';
+            let connectedAs = 'local websocket';
             this.logger.log("Connected as " + connectedAs);
             this.connectedAs = connectedAs;
             this.logger.log("Retrieve configuration");
@@ -168,7 +176,7 @@ class SystemAccessPoint {
         return __awaiter(this, void 0, void 0, function* () {
             let bwaToken = this.client.getBWAToken();
             try {
-                let response = yield axios_1.default.put(this._protocol2 + this.configuration.hostname + this._path2api + '/rest/datapoint/' + this._uuid + '/' + message, value, {
+                let response = yield this.axios.put(this._protocol2 + this.configuration.hostname + this._path2api + '/rest/datapoint/' + this._uuid + '/' + message, value, {
                     headers: { 'Authorization': 'Basic ' + bwaToken }
                 });
                 if (response.status != 200) {
@@ -184,8 +192,8 @@ class SystemAccessPoint {
     connect() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.createClient();
-            if ((0, compare_versions_1.default)(this.settings.flags.version, '2.3.1') < 0) {
-                throw Error('Your System Access Point\'s firmware must be at least 2.3.1');
+            if ((0, compare_versions_1.default)(this.settings.flags.version, this._minversionAP) < 0) {
+                throw Error('Your System Access Point\'s firmware must be at least ' + this._minversionAP);
             }
             try {
                 yield this.client.start();
@@ -247,19 +255,19 @@ class SystemAccessPoint {
                     if (this.deviceData[serialNo]['channels'][channelNo]['datapoints'] != null) {
                         this.deviceData[serialNo]['channels'][channelNo]['datapoints'][datapointNo] = value;
                     }
-                    else if (this.deviceData[serialNo]['channels'][channelNo]['outputs'][datapointNo] != null) {
+                    else {
+                        let channelKey = '';
+                        if (this.deviceData[serialNo]['channels'][channelNo]['outputs'][datapointNo] != null) {
+                            channelKey = 'outputs';
+                        }
+                        else if (this.deviceData[serialNo]['channels'][channelNo]['inputs'][datapointNo] != null) {
+                            channelKey = 'inputs';
+                        }
                         upd[serialNo]['channels'] = [];
                         upd[serialNo]['channels'][channelNo] = [];
-                        upd[serialNo]['channels'][channelNo]['outputs'] = [];
-                        upd[serialNo]['channels'][channelNo]['outputs'][datapointNo] = this.deviceData[serialNo]['channels'][channelNo]['outputs'][datapointNo];
-                        upd[serialNo]['channels'][channelNo]['outputs'][datapointNo].value = value;
-                    }
-                    else if (this.deviceData[serialNo]['channels'][channelNo]['inputs'][datapointNo] != null) {
-                        upd[serialNo]['channels'] = [];
-                        upd[serialNo]['channels'][channelNo] = [];
-                        upd[serialNo]['channels'][channelNo]['inputs'] = [];
-                        upd[serialNo]['channels'][channelNo]['inputs'][datapointNo] = this.deviceData[serialNo]['channels'][channelNo]['inputs'][datapointNo];
-                        upd[serialNo]['channels'][channelNo]['inputs'][datapointNo].value = value;
+                        upd[serialNo]['channels'][channelNo][channelKey] = [];
+                        upd[serialNo]['channels'][channelNo][channelKey][datapointNo] = this.deviceData[serialNo]['channels'][channelNo][channelKey][datapointNo];
+                        upd[serialNo]['channels'][channelNo][channelKey][datapointNo].value = value;
                     }
                     upd[serialNo]['serial'] = serialNo;
                     this.logger.debug("Updated Datapoint: " + serialNo + '/' + channelNo + '/' + datapointNo + '/' + value);
