@@ -23,7 +23,9 @@ class SystemAccessPoint {
     constructor(configuration, subscriber, logger) {
         this.online = false;
         this.keepAliveMessageId = 1;
+        this.pingTimeoutSeconds = 10000;
         this.keepAliveTimer = null;
+        this.pingTimeout = null;
         this.deviceData = {};
         this.subscribed = false;
         this.logger = new Logger_1.ConsoleLogger();
@@ -136,19 +138,24 @@ class SystemAccessPoint {
         });
         this.client.guardedOn('message', (stanza) => __awaiter(this, void 0, void 0, function* () {
             var _a;
-            this.logger.debug('Received stanza:', stanza);
+            this.logger.debug('Received stanza:', JSON.parse(stanza));
             let astanza = (_a = JSON.parse(stanza)[this._uuid]) !== null && _a !== void 0 ? _a : null;
+            this.heartBeat();
             if (astanza.datapoints) {
                 this.handleEvent(astanza);
             }
         }));
         this.client.on('open', (address) => __awaiter(this, void 0, void 0, function* () {
-            let connectedAs = 'local websocket';
+            let connectedAs = 'Local API Websocket';
             this.logger.log("Connected as " + connectedAs);
             this.connectedAs = connectedAs;
-            this.logger.log("Retrieve configuration");
+            this.logger.log("Retrieving configuration...");
             let deviceData = this.getDeviceConfiguration();
         }));
+        this.client.on('ping', ping => {
+            this.heartBeat();
+            this.logger.debug('WS Ping:', ping);
+        });
         this.client.on('status', status => {
             this.logger.debug('Received new status:', status);
         });
@@ -157,6 +164,17 @@ class SystemAccessPoint {
         });
         this.client.on('output', output => {
             this.logger.debug('Received new output data:', output);
+        });
+    }
+    heartBeat() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.pingTimeout) {
+                clearTimeout(this.pingTimeout);
+            }
+            let self = this;
+            this.logger.debug("*** heartBeat " + this.pingTimeoutSeconds);
+            this.pingTimeout = setTimeout(() => {
+            }, this.pingTimeoutSeconds);
         });
     }
     handleEvent(stanza) {
@@ -197,7 +215,7 @@ class SystemAccessPoint {
             }
             try {
                 yield this.client.start();
-                this.sendKeepAliveMessages();
+                this.heartBeat();
             }
             catch (e) {
                 this.logger.error('Could not connect to System Access Point', e.toString());
@@ -207,7 +225,7 @@ class SystemAccessPoint {
     }
     disconnect() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.logger.log("Disconnecting from the System Access Point");
+            this.logger.log("Disconnecting from the System Access Point...");
             yield this.client.stop();
         });
     }

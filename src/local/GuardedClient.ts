@@ -35,7 +35,6 @@ export class GuardedClient {
         return this._bwaToken
     }
 
-
     on(event: string, fn: (a: any) => any): void {
         this.client.on(event, fn)
     }
@@ -48,6 +47,9 @@ export class GuardedClient {
     guardedOn(event: string, fn: (a: any) => any): void {
         const guardedFn = async (a: any) => {
             try {
+                
+                this.logger.debug("this.client.readyState:" + this.client.readyState)
+                //this.logger.debug(this.client)
                 await fn(a)
             } catch (err: any) {
                 this.logger.error(`Unexpected error while processing ${event} event`, err)
@@ -57,6 +59,8 @@ export class GuardedClient {
 
         this.client.on(event, guardedFn)
     }
+
+    
 
     send(stanza: any): Promise<any> {
         //return new Promise (executor: this.client.send(stanza))
@@ -68,6 +72,14 @@ export class GuardedClient {
             } else {
                 resolve()
             }
+        })
+    }
+
+    ping(): Promise<any> {
+    
+        return new Promise<void>((resolve, reject) => {
+            this.logger.debug("*** PING ***")
+            resolve()
         })
     }
 
@@ -91,6 +103,13 @@ export class GuardedClient {
             } else {
                 resolve()
             }
+        })
+    }
+
+    terminate(): Promise<any> {
+        return new Promise<void>((resolve, reject) => {
+                this.client.terminate()
+                resolve()
         })
     }
 

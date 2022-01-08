@@ -10,7 +10,9 @@ export declare class GuardedClient {
     on(event: string, fn: (a: any) => any): void;
     guardedOn(event: string, fn: (a: any) => any): void;
     send(stanza: any): Promise<any>;
+    ping(): Promise<any>;
     start(): Promise<any>;
     stop(): Promise<any>;
+    terminate(): Promise<any>;
     private broadCastError;
 }

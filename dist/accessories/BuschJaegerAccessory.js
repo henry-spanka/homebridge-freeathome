@@ -7,7 +7,7 @@ function BuschJaegerAccessory(platform, Service, Characteristic, actuator, chann
     this.typeId = actuator['deviceId'];
     this.channel = channel ? this.removeChannelPrefix(channel) : null;
     if (this.channel) {
-        this.uuid_base = this.serial + '/ch' + this.channel;
+        this.uuid_base = this.serial + 'ch' + this.channel;
     }
     else {
         this.channel = '0000';

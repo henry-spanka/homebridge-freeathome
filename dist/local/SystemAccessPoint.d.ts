@@ -12,7 +12,9 @@ export declare class SystemAccessPoint {
     private connectedAs;
     private user;
     private keepAliveMessageId;
+    private pingTimeoutSeconds;
     private keepAliveTimer;
+    private pingTimeout;
     private deviceData;
     private subscribed;
     private axios;
@@ -28,6 +30,7 @@ export declare class SystemAccessPoint {
     private getSettings;
     private getDeviceConfiguration;
     private registerHandlers;
+    private heartBeat;
     private handleEvent;
     private unwrapEventData;
     private sendMessage;

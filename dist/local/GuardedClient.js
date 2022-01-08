@@ -41,6 +41,7 @@ class GuardedClient {
     guardedOn(event, fn) {
         const guardedFn = (a) => __awaiter(this, void 0, void 0, function* () {
             try {
+                this.logger.debug("this.client.readyState:" + this.client.readyState);
                 yield fn(a);
             }
             catch (err) {
@@ -59,6 +60,12 @@ class GuardedClient {
             else {
                 resolve();
             }
+        });
+    }
+    ping() {
+        return new Promise((resolve, reject) => {
+            this.logger.debug("*** PING ***");
+            resolve();
         });
     }
     start() {
@@ -80,6 +87,12 @@ class GuardedClient {
             else {
                 resolve();
             }
+        });
+    }
+    terminate() {
+        return new Promise((resolve, reject) => {
+            this.client.terminate();
+            resolve();
         });
     }
     broadCastError(err) {
