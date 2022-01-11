@@ -11,8 +11,8 @@ Homebridge platform plugin for free@home SmartHome devices.
 
 
 
-[![npm](https://img.shields.io/npm/v/homebridge-freeathome?style=for-the-badge)](https://www.npmjs.com/package/homebridge-freeathome)
-[![npm](https://img.shields.io/npm/dt/homebridge-freeathome?style=for-the-badge)](https://www.npmjs.com/package/homebridge-freeathome)
+[![npm](https://img.shields.io/npm/v/homebridge-freeathome-local?style=for-the-badge)](https://www.npmjs.com/package/homebridge-freeathome-local)
+[![npm](https://img.shields.io/npm/dt/homebridge-freeathome-local?style=for-the-badge)](https://www.npmjs.com/package/homebridge-freeathome-local)
 [![GitHub issues](https://img.shields.io/github/issues/superyaro/homebridge-freeathome?style=for-the-badge)](https://github.com/superyaro/homebridge-freeathome/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/superyaro/homebridge-freeathome?style=for-the-badge)](https://github.com/superyaro/homebridge-freeathome/pulls)
 
