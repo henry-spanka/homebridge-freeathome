@@ -1,0 +1,181 @@
+{
+    "pluginAlias": "free@home",
+    "pluginType": "platform",
+    "headerDisplay": "Platform plugin to manage Busch Jäger free@home accessories via HomeBridge.",
+    "footerDisplay": "See <a href='https://github.com/superyaro/homebridge-freeathome#configuration'>Configuration</a> section for further information.",
+    "singular": false,
+    "schema": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "title": "Platform ID",
+                "type": "string",
+                "required": true,
+                "default": "BuschJaegerSysAp"
+            },
+            "sysIP": {
+                "title": "IP-Address",
+                "type": "string",
+                "required": true,
+                "format": "hostname",
+                "description": "The IP-Address of your Busch Jäger access point."
+            },
+            "username": {
+                "title": "User Name",
+                "type": "string",
+                "required": true,
+                "default": "installer",
+                "description": "User name of your admin SysAP user (installer recomended)"
+            },
+            "password": {
+                "title": "Password",
+                "type": "string",
+                "required": true,
+                "default": "",
+                "description": "Password of your admin SysAP user"
+            },
+            "isLocalAPI": {
+                "title": "Use Local API",
+                "type": "boolean",
+                "default": true,
+                "description": "Use the local API instead of the old Cloud API."
+            },
+            "useTLS": {
+                "title": "Encryption",
+                "type": "string",
+                "default": "true",
+                "description": "Using TLS for encrypted communication beetween Homebridge and your SysAP API ist recommended.",
+                "oneOf": [
+                    {
+                        "title": "TLS (HTTPS)",
+                        "enum": [
+                            true
+                        ]
+                    },
+                    {
+                        "title": "PLAIN (HTTP)",
+                        "enum": [
+                            false
+                        ]
+                    }
+                ]
+            },
+            "debug": {
+                "title": "Debug",
+                "type": "boolean",
+                "default": false,
+                "description": "Enable for more detailed logging information."
+            },
+            "mappings": {
+                "type": "array",
+                "description": "You can configure the mappings if you want to ignore an actuator or channel if they are not connected/unused to hide them from the HomeKit UI. You can find the actuator serial in the web interface of the free@home SysAp Interface.",
+                "orderable": true,
+                "buttonText": "New actuator mapping",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "actuatorID": {
+                            "type": "string"
+                        },
+                        "blacklist": {
+                            "type": "array",
+                            "buttonText": "New blacklisted channel",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "channelID": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "layout": [
+        {
+            "key": "name",
+            "type": "string"
+        },
+        {
+            "key": "sysIP"
+        },
+        {
+            "type": "div",
+            "display": "flex",
+            "flex-direction": "row",
+            "items": [
+                {
+                    "key": "username",
+                    "flex": "1 1 50px"
+                },
+                {
+                    "key": "password",
+                    "flex": "1 1 50px"
+                }
+            ]
+        },
+        {
+            "key": "isLocalAPI"
+        },
+        {
+            "key": "useTLS"
+        },
+        {
+            "key": "debug"
+        },
+        {
+            "type": "section",
+            "title": "Mappings",
+            "expandable": true,
+            "expanded": false,
+            "items": [
+                {
+                    "key": "mappings",
+                    "type": "array",
+                    "listItems": 1,
+                    "notitle": true,
+                    "items": [
+                        {
+                            "type": "div",
+                            "displayFlex": true,
+                            "flex-direction": "row",
+                            "items": [
+                                {
+                                    "key": "mappings[].actuatorID",
+                                    "flex": "1 1 150px",
+                                    "notitle": true,
+                                    "placeholder": "Actuator Serial"
+                                },
+                                {
+                                    "key": "mappings[].blacklist",
+                                    "notitle": true,
+                                    "type": "array",
+                                    "listItems": 1,
+                                    "items": [
+                                        {
+                                            "type": "div",
+                                            "displayFlex": true,
+                                            "flex-direction": "row",
+                                            "items": [
+                                                {
+                                                    "key": "mappings[].blacklist[].channelID",
+                                                    "flex": "1 1 50px",
+                                                    "notitle": true,
+                                                    "default": "*",
+                                                    "placeholder": "ChannelID or *"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

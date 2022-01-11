@@ -110,7 +110,7 @@ class SystemAccessPoint {
                 return response.data;
             }
             catch (e) {
-                this.logger.error("Unexpected status code from System Access Point while retrieving " + _restpath);
+                this.logger.error("Unexpected status code from System Access Point while retrieving " + _restpath + "\n" + e.toString());
                 return null;
             }
         });

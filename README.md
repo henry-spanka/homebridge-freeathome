@@ -55,8 +55,12 @@ Homebridge platform plugin for free@home SmartHome devices.
 5. Star the repository ;)
 
 # Configuration
+You can configure the plugin in [Homebridge Config UI X](https://github.com/oznu/homebridge-config-ui-x#readme) now:
+![HomeKit UI](images/homebridge_ui_config.png)
+Caveats: the mapping for blacklisted actuators doesn't work yet, since  *Homebridge Config UI X* demands a different json structure.
 
-To configure the plugin add the following json in the platform section in `config.json`.
+Of course you can configure the Plugin still raw in the `config.json`:
+
 ```json
 {
     "platform": "free@home",

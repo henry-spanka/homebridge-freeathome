@@ -1,3 +1,15 @@
+### 3.0.0 (2022-01-11)
+
+* Ready for SysAP v3.0
+* Homebridge UI config
+* Readme
+
+### 2.6.1 (2022-01-06)
+
+* Ping timeout websocket
+* Better logging information on connect
+* Return to old UUID to avoid loosing accessories configuration (like automisation, room assignments or custom nameing) in Home.app
+
 ### 2.6.0 (2022-01-03)
 
 * Added experimental support for the local REST API (instead of the Jabber Cloud solution)

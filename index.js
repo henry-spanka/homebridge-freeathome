@@ -21,7 +21,7 @@ module.exports = function (homebridge) {
     // For platform plugin to be considered as dynamic platform plugin,
     // registerPlatform(pluginName, platformName, constructor, dynamic), dynamic must be true
     homebridge.registerPlatform("homebridge-freeathome", "free@home", BuschJaegerApPlatform, true);
-    homebridge.registerPlatform("homebridge-freeathome", "BuschJaegerSysAp", BuschJaegerApPlatform, true); // deprecated
+
 }
 
 // Platform constructor
@@ -71,13 +71,15 @@ BuschJaegerApPlatform.prototype.transformAccessories = function (actuators) {
 
     for (let serial in actuators) {
         let mapping = {};
-        if (this.mappings && serial in this.mappings) {
-            mapping = this.mappings[serial];
+        if (this.mappings) {
+            mapping = this.mappings.filter(obj => {
+                return obj.actuatorID === serial
+            })?.shift()
         }
 
         let actuator = actuators[serial];
 
-        if ('blacklist' in mapping && mapping['blacklist'].includes('*')) {
+        if (mapping!==undefined && mapping['blacklist']?.find(o => {return o.channelID === '*' })?.channelID!==undefined ) {
             this.log('Ignoring blacklisted accessory ' + actuator['typeName'] + ' with serial ' + serial);
             continue;
         }
@@ -116,7 +118,7 @@ BuschJaegerApPlatform.prototype.initializeAccessory = function (channelNo, actua
         channelNo = forcedChannel;
     }
 
-    if ('blacklist' in mapping && mapping['blacklist'].includes(channelNo)) {
+    if (mapping!==undefined && mapping['blacklist']?.find(o => {return o.channelID === channelNo })?.channelID!==undefined ) {
         this.log('Ignoring blacklisted accessory ' + actuator['typeName'] + '/' + channel['displayName'] + ' with serial ' + serial + ' and channel ' + channelNo);
         return;
     }
@@ -148,7 +150,7 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function (deviceId, channel,
         //return [null, null];
     }
 
-    if ('doorbell' in mapping && channel in mapping['doorbell']) {
+    if (mapping!==undefined && 'doorbell' in mapping && channel in mapping['doorbell']) {
         let doorbell = mapping['doorbell'][channel];
 
         if (doorbell['video']) {
@@ -156,7 +158,7 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function (deviceId, channel,
         } else {
             return ['BuschJaegerDoorBellAccessory', null];
         }
-    } else if ('garagedoor' in mapping && channel in mapping['garagedoor']) {
+    } else if (mapping!==undefined && 'garagedoor' in mapping && channel in mapping['garagedoor']) {
         return ['BuschJaegerGarageDoorAccessory', null];
     }
 
@@ -292,14 +294,14 @@ BuschJaegerApPlatform.prototype.processUpdate = function (actuators) {
                     // value is somehow a referenz to *['outputs'][datapoint] so we don't need to assign it here
                     //this.actuatorInfo[serial]['channels'][channel]['outputs'][datapoint] = value;
                     this.sendUpdateToAccessory(serial, channel.replace('ch', ''), datapoint, value);
-                    
+
                 }
                 for (let datapoint in channels['inputs']) {
-                    let value = channels['inputs'][datapoint];      
+                    let value = channels['inputs'][datapoint];
                     // value is somehow a referenz to *['outputs'][datapoint] so we don't need to assign it here              
                     //this.actuatorInfo[serial]['channels'][channel]['inputs'][datapoint] = value;
                     this.sendUpdateToAccessory(serial, channel.replace('ch', ''), datapoint, value);
-                    
+
                 }
             }
         }

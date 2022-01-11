@@ -152,8 +152,9 @@ export class SystemAccessPoint {
             this.subscriber.broadcastMessage({ result: response.data, type: 'subscribed' })
             return response.data
         }
-        catch (e) {
-            this.logger.error("Unexpected status code from System Access Point while retrieving " + _restpath)
+        catch (e: any) {
+            this.logger.error("Unexpected status code from System Access Point while retrieving " + _restpath + "\n" + e.toString());
+                
             return null
         }
 
