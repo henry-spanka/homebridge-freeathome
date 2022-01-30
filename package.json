@@ -1,6 +1,6 @@
 {
   "name": "homebridge-freeathome-local",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Platform Plugin to manage free@home accessories via HomeBridge using local API",
   "license": "MIT",
   "keywords": [

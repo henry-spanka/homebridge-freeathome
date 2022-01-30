@@ -38,7 +38,7 @@ function BuschJaegerApPlatform(log, config, api) {
 
     this.log('Will try to connect to the SysAP at %s', config.sysIP);
 
-    if (config.isLocalAPI == true) {
+    if (config.isLocalAPI == true||config.isLocalAPI == "true") {
         API = APILOCAL;
     } else {
         API = APICLOUD;

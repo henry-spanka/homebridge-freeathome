@@ -64,6 +64,8 @@
                 "title": "DimmActor Minimum Brightness",
                 "type": "integer",
                 "default": 1,
+                "minimum":0,
+                "maximum":100,
                 "description": "A Minimum Brightness Value of all DimmActors."
             },
             "debug": {
@@ -128,6 +130,9 @@
         },
         {
             "key": "useTLS"
+        },
+        {
+            "key": "dimmActorMinValue"
         },
         {
             "key": "debug"

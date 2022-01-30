@@ -1,5 +1,9 @@
 ### 3.0.2
 
+* Config UI fixed 
+
+### 3.0.2
+
 * Fixed a bug in BuschJaegerDimmAktorAccessory wich stopped the plugin from working
 * New Setting "dimmActorMinValue"
 * Removed useless reading from "Input Datapoints"
