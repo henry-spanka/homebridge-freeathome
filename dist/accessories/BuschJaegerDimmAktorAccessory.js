@@ -2,6 +2,7 @@
 var util = require("util");
 var BuschJaegerAccessory = require('./BuschJaegerAccessory.js').BuschJaegerAccessory;
 function BuschJaegerDimmAktorAccessory(platform, Service, Characteristic, actuator, channel = null, mapping = null) {
+    var _a, _b;
     BuschJaegerDimmAktorAccessory.super_.apply(this, arguments);
     var lightBulbService = new Service.Lightbulb();
     lightBulbService.getCharacteristic(Characteristic.On)
@@ -10,7 +11,7 @@ function BuschJaegerDimmAktorAccessory(platform, Service, Characteristic, actuat
     lightBulbService.getCharacteristic(Characteristic.Brightness)
         .on('get', this.getBrightness.bind(this))
         .on('set', this.setBrightness.bind(this));
-    let minBrightness = parseInt(this.getValue(this.channel, 'pm0001'));
+    let minBrightness = parseInt((_b = (_a = this.getValue(this.channel, 'pm0001')) !== null && _a !== void 0 ? _a : this.platform.config.dimmActorMinValue) !== null && _b !== void 0 ? _b : 0);
     if (minBrightness > 1 && minBrightness < 100) {
         lightBulbService.getCharacteristic(Characteristic.Brightness)
             .setProps({

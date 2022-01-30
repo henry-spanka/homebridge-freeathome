@@ -18,7 +18,12 @@ function BuschJaegerDimmAktorAccessory(platform, Service, Characteristic, actuat
         .on('get', this.getBrightness.bind(this))
         .on('set', this.setBrightness.bind(this));
 
-    let minBrightness = parseInt(this.getValue(this.channel, 'pm0001'));
+    /**
+     * pm0001 is provided by cloudAPI only
+     * local API tries to get dimmActorMinValue from settings
+     * otherwise minBrightness will be set to 0
+     */
+    let minBrightness = parseInt(this.getValue(this.channel, 'pm0001')??this.platform.config.dimmActorMinValue??0);  
 
     if (minBrightness > 1 && minBrightness < 100) {
         lightBulbService.getCharacteristic(Characteristic.Brightness)

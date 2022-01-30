@@ -6,7 +6,6 @@ var Service, Characteristic, Hap, PlatformAccessory
 
 var APICLOUD = require('freeathome-api');
 var APILOCAL = require(path.join(__dirname, 'dist', 'local-api'));
-//var APILOCAL;
 var API;
 
 module.exports = function (homebridge) {

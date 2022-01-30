@@ -68,6 +68,7 @@ Of course you can configure the Plugin still raw in the `config.json`:
     "username": "<USERNAME>",
     "password": "<PASSWORD>",
     "isLocalAPI": <true|false>,
+    "dimmActorMinValue": <0|100>,
     "mappings": {}
 }
 ```
@@ -82,6 +83,8 @@ You can configure the *mappings* if you want to ignore an actuator or channel if
     "sysIP": "<IP>",
     "username": "<USERNAME>",
     "password": "<PASSWORD>",
+    "isLocalAPI": <true|false>,
+    "dimmActorMinValue": <0|100>,
     "mappings": {
         "<ACTUATOR-SERIAL>": {
             "blacklist": ["ch0000", "ch0001"],

@@ -60,6 +60,12 @@
                     }
                 ]
             },
+            "dimmActorMinValue": {
+                "title": "DimmActor Minimum Brightness",
+                "type": "integer",
+                "default": 1,
+                "description": "A Minimum Brightness Value of all DimmActors."
+            },
             "debug": {
                 "title": "Debug",
                 "type": "boolean",

@@ -51,9 +51,6 @@ BuschJaegerAccessory.prototype = {
             else if (ach['outputs'] && datapoint in ach['outputs']) {
                 return ach['outputs'][datapoint].value;
             }
-            else if (ach['inputs'] && datapoint in ach['inputs'].value) {
-                return ach['inputs'][datapoint];
-            }
         }
         return null;
     },
