@@ -22,6 +22,7 @@ const https = require('https');
 class SystemAccessPoint {
     constructor(configuration, subscriber, logger) {
         this.online = false;
+        this.useTLS = false;
         this.keepAliveMessageId = 1;
         this.pingTimeoutSeconds = 10000;
         this.keepAliveTimer = null;
@@ -29,8 +30,6 @@ class SystemAccessPoint {
         this.deviceData = {};
         this.subscribed = false;
         this.logger = new Logger_1.ConsoleLogger();
-        this._protocol1 = 'wss://';
-        this._protocol2 = 'https://';
         this._port = '';
         this._path2api = '/fhapi/v1/api';
         this._uuid = '00000000-0000-0000-0000-000000000000';
@@ -63,7 +62,7 @@ class SystemAccessPoint {
             this.user = user;
             let username = user.jid.split('@')[0];
             this.client = new GuardedClient_1.GuardedClient(this.subscriber, {
-                service: this._protocol1 + this.configuration.hostname + ((this._port != '') ? ':' + this._port : '') + this._path2api + '/ws',
+                service: this.getProtocolWS() + this.configuration.hostname + ((this._port != '') ? ':' + this._port : '') + this._path2api + '/ws',
                 from: this.configuration.hostname,
                 resource: 'freeathome-api',
                 username: username,
@@ -75,7 +74,7 @@ class SystemAccessPoint {
     }
     getSettings() {
         return __awaiter(this, void 0, void 0, function* () {
-            let response = yield this.axios.get(this._protocol2 + this.configuration.hostname + '/settings.json');
+            let response = yield this.axios.get(this.getProtocolHTTP() + this.configuration.hostname + '/settings.json');
             if (response.status != 200) {
                 this.logger.error("Unexpected status code from System Access Point while retrieving settings.json.");
                 throw new Error("Unexpected status code from System Access Point while retrieving settings.json.");
@@ -97,7 +96,7 @@ class SystemAccessPoint {
             let _restpath = '/rest/configuration';
             let bwaToken = this.client.getBWAToken();
             try {
-                let response = yield this.axios.get(this._protocol2 + this.configuration.hostname + this._path2api + _restpath, {
+                let response = yield this.axios.get(this.getProtocolHTTP() + this.configuration.hostname + this._path2api + _restpath, {
                     headers: { 'Authorization': 'Basic ' + bwaToken }
                 });
                 if (response.status != 200) {
@@ -190,11 +189,29 @@ class SystemAccessPoint {
     unwrapEventData(item) {
         return "";
     }
+    getProtocolHTTP() {
+        let tls = this.subscriber.getConfig()['useTLS'];
+        if (tls === true || tls === 'true') {
+            return 'https://';
+        }
+        else {
+            return 'http://';
+        }
+    }
+    getProtocolWS() {
+        let tls = this.subscriber.getConfig()['useTLS'];
+        if (tls === true || tls === 'true') {
+            return 'wss://';
+        }
+        else {
+            return 'ws://';
+        }
+    }
     sendMessage(message, value) {
         return __awaiter(this, void 0, void 0, function* () {
             let bwaToken = this.client.getBWAToken();
             try {
-                let response = yield this.axios.put(this._protocol2 + this.configuration.hostname + this._path2api + '/rest/datapoint/' + this._uuid + '/' + message, value, {
+                let response = yield this.axios.put(this.getProtocolHTTP() + this.configuration.hostname + this._path2api + '/rest/datapoint/' + this._uuid + '/' + message, value, {
                     headers: { 'Authorization': 'Basic ' + bwaToken }
                 });
                 if (response.status != 200) {

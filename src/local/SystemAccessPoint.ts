@@ -3,7 +3,7 @@ import compareVersions from "compare-versions"
 import FatHAPI from "freeathome-api"
 import { SystemAccessPointSettings, SystemAccessPointUser } from "freeathome-api/dist/lib/SystemAccessPointSettings"
 import { ClientConfiguration } from "freeathome-api/dist/lib/Configuration"
-import { Subscriber } from "freeathome-api/dist/lib/Subscriber"
+import { Subscriber } from "./Subscriber"
 import { Logger, ConsoleLogger } from "freeathome-api/dist/lib/Logger"
 import { General, Message, Result } from "freeathome-api/dist/lib/constants"
 import { GuardedClient } from './GuardedClient'
@@ -18,6 +18,8 @@ export class SystemAccessPoint {
     private messageBuilder: MessageBuilder | undefined
     private crypto: Crypto | undefined
     private online: boolean = false
+    private useTLS: boolean = false
+
     private settings: SystemAccessPointSettings | undefined
     private connectedAs: string | undefined
     private user: SystemAccessPointUser | undefined
@@ -29,12 +31,6 @@ export class SystemAccessPoint {
     private subscribed: boolean = false
     private axios: Axios
     private logger: Logger = new ConsoleLogger()
-
-    /**
-     * protocols, we need some smarter way in the future (enableTLS: true in config)
-     */
-    private readonly _protocol1 = 'wss://'
-    private readonly _protocol2 = 'https://'
     
     /**
      * ports will be set automagically (hopefully)
@@ -59,6 +55,7 @@ export class SystemAccessPoint {
     constructor(configuration: ClientConfiguration, subscriber: Subscriber, logger: Logger | null) {
         this.configuration = configuration
         this.subscriber = subscriber
+        //this.useTLS = subscriber.config.useTLS
         if (logger !== undefined && logger !== null) {
             this.logger = logger
         }
@@ -97,7 +94,7 @@ export class SystemAccessPoint {
          * private readonly _path2api = '/fhapi/v1/api'
          */
         this.client = new GuardedClient(this.subscriber, {
-            service: this._protocol1 + this.configuration.hostname +  ((this._port!='')?':' + this._port:'') + this._path2api + '/ws',
+            service: this.getProtocolWS() + this.configuration.hostname +  ((this._port!='')?':' + this._port:'') + this._path2api + '/ws',
             from: this.configuration.hostname,
             resource: 'freeathome-api',
             username: username,
@@ -109,7 +106,7 @@ export class SystemAccessPoint {
     }
 
     private async getSettings(): Promise<SystemAccessPointSettings> {
-        let response = await this.axios.get(this._protocol2 + this.configuration.hostname + '/settings.json')
+        let response = await this.axios.get(this.getProtocolHTTP() + this.configuration.hostname + '/settings.json')
 
         if (response.status != 200) {
             this.logger.error("Unexpected status code from System Access Point while retrieving settings.json.")
@@ -133,7 +130,7 @@ export class SystemAccessPoint {
         let _restpath = '/rest/configuration'
         let bwaToken = this.client!.getBWAToken()
         try {
-            let response = await this.axios.get(this._protocol2 + this.configuration.hostname + this._path2api + _restpath, {
+            let response = await this.axios.get(this.getProtocolHTTP() + this.configuration.hostname + this._path2api + _restpath, {
                 headers: { 'Authorization': 'Basic ' + bwaToken }
             })
 
@@ -266,11 +263,31 @@ export class SystemAccessPoint {
         return "";
     }
 
+    private getProtocolHTTP() {
+        let tls = this.subscriber.getConfig()['useTLS'];
+        if (tls === true || tls === 'true') {
+            return 'https://'
+        }
+        else {
+            return 'http://'
+        }
+    }
+
+    private getProtocolWS() {
+        let tls = this.subscriber.getConfig()['useTLS'];
+        if (tls === true || tls === 'true') {
+            return 'wss://'
+        }
+        else {
+            return 'ws://'
+        }
+    }
+
     private async sendMessage(message: any, value: string) {
         // await this.client!.send(message)
         let bwaToken = this.client!.getBWAToken()
         try {
-            let response = await this.axios.put(this._protocol2 + this.configuration.hostname + this._path2api + '/rest/datapoint/' + this._uuid + '/' + message,
+            let response = await this.axios.put(this.getProtocolHTTP() + this.configuration.hostname + this._path2api + '/rest/datapoint/' + this._uuid + '/' + message,
                 value,
                 {
                     headers: { 'Authorization': 'Basic ' + bwaToken }

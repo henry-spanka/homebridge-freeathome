@@ -15,9 +15,9 @@ export class MessageBuilder {
 
     /**
      * set DP via https REST API via PUT:
-     * http://192.168.9.40/fhapi/v1/api/rest/datapoint/00000000-0000-0000-0000-000000000000/ABB700DCDED6.ch0000.odp0010
+     * http://192.0.0.0/fhapi/v1/api/rest/datapoint/00000000-0000-0000-0000-000000000000/ABB000000.ch0000.odp0010
      * 
-     * @param serialNo ABB700DCDED6
+     * @param serialNo ABB000000
      * @param channel ch0000
      * @param datapoint odp0010
      * @param value xxx DEPRECATED

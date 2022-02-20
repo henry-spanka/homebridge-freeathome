@@ -44,6 +44,8 @@ function BuschJaegerApPlatform(log, config, api) {
         API = APICLOUD;
     }
 
+    this.config = config;
+
     this.configuration = new API.ClientConfiguration(config.sysIP, config.username, config.password);
 
     this.accessoryCallback = null;
@@ -57,7 +59,7 @@ function BuschJaegerApPlatform(log, config, api) {
 
     this.foundAccessories = [];
 
-    this.config = config;
+    
 }
 
 BuschJaegerApPlatform.prototype.accessories = function (callback) {
@@ -166,8 +168,10 @@ BuschJaegerApPlatform.prototype.getAccessoryClass = function (deviceId, channel,
             return ['BuschJaegerBinarySensorAccessory', null];
         case '7':
             return ['BuschJaegerSchaltAktorAccessory', null];
-        case '9':
-        case '61':
+        case '9':  // Shutter actuator
+        case '61': // Blind actuator
+        case '62': // Attic window actuator
+        case '63': // Awning actuator
             return ['BuschJaegerJalousieAccessory', null];
         case '11':
             return ['BuschJaegerMotionSensorAccessory', null];
@@ -330,6 +334,8 @@ BuschJaegerApPlatform.prototype.findAccessoryBySerial = function (sn, ch = null)
     return null;
 }
 
+////// Interface Impl
+
 BuschJaegerApPlatform.prototype.broadcastMessage = function (message) {
     switch (message.type) {
         case 'error':
@@ -348,4 +354,8 @@ BuschJaegerApPlatform.prototype.broadcastMessage = function (message) {
         default:
             this.log.warn("Unknown message type received: " + message.type);
     }
+}
+
+BuschJaegerApPlatform.prototype.getConfig = function () {
+    return this.config
 }

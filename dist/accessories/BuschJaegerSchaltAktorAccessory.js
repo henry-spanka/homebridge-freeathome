@@ -3,7 +3,7 @@ var util = require("util");
 var BuschJaegerAccessory = require('./BuschJaegerAccessory.js').BuschJaegerAccessory;
 function BuschJaegerSchaltAktorAccessory(platform, Service, Characteristic, actuator, channel = null, mapping = null) {
     BuschJaegerSchaltAktorAccessory.super_.apply(this, arguments);
-    var outletService = this.getChannelAttribute("iconId") == '1' ? new Service.Lightbulb : new Service.Outlet();
+    var outletService = this.getChannelAttribute("iconId") == '1' ? new Service.Lightbulb() : new Service.Outlet();
     outletService.getCharacteristic(Characteristic.On)
         .on('get', this.getOn.bind(this))
         .on('set', this.setOn.bind(this));

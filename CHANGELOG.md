@@ -1,4 +1,11 @@
-### 3.0.2
+### 3.0.4-beta.0
+
+* Config setting for TLS or Plain communication (UseTLS)
+* Attic window actuator & Awning actuator added
+* Update npm modules to current versions
+
+
+### 3.0.3
 
 * Config UI fixed 
 

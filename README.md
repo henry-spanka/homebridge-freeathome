@@ -104,8 +104,6 @@ You need to activate local API settings in the SysAP settings of the free@home n
 
 This feature is NOT available in the web backend!
 
-You should activate SSH (TLS) support as well in Settings > Service in the App or backend.
-
 User/Password will be the same as for the Cloud API, the user "installer" seems to be the most reliable.
 
 In your config.json you need to set `"isLocalAPI": true,`

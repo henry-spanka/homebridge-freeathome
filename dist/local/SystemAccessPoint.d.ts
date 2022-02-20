@@ -1,5 +1,5 @@
 import { ClientConfiguration } from "freeathome-api/dist/lib/Configuration";
-import { Subscriber } from "freeathome-api/dist/lib/Subscriber";
+import { Subscriber } from "./Subscriber";
 import { Logger } from "freeathome-api/dist/lib/Logger";
 export declare class SystemAccessPoint {
     private configuration;
@@ -8,6 +8,7 @@ export declare class SystemAccessPoint {
     private messageBuilder;
     private crypto;
     private online;
+    private useTLS;
     private settings;
     private connectedAs;
     private user;
@@ -19,8 +20,6 @@ export declare class SystemAccessPoint {
     private subscribed;
     private axios;
     private logger;
-    private readonly _protocol1;
-    private readonly _protocol2;
     private _port;
     private readonly _path2api;
     private _uuid;
@@ -33,6 +32,8 @@ export declare class SystemAccessPoint {
     private heartBeat;
     private handleEvent;
     private unwrapEventData;
+    private getProtocolHTTP;
+    private getProtocolWS;
     private sendMessage;
     connect(): Promise<void>;
     disconnect(): Promise<void>;
