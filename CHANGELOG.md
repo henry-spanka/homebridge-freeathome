@@ -1,3 +1,6 @@
+### 2.0.4 (2022-10-09)
+* Require at least freeathome-api version 1.1.2 to support newer access point firmwares
+
 ### 2.0.3 (2020-08-19)
 
 * Fix issue which would prevent accessories from reading correct datapoint values
