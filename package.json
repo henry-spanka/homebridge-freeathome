@@ -1,6 +1,6 @@
 {
     "name": "homebridge-freeathome",
-    "version": "2.0.5",
+    "version": "2.0.6",
     "description": "Platform Plugin to manage free@home accessories via HomeBridge",
     "license": "MIT",
     "keywords": [

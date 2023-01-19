@@ -1,3 +1,7 @@
+### 2.0.6 (2023-01-19)
+
+* fix crashing on contact sensor datapoint override
+
 ### 2.0.5 (2023-01-19)
 
 * add contact sensor datapoint override
