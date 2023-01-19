@@ -57,7 +57,8 @@ To configure the plugin add the following json in the platform section in `confi
     "sysIP": "<IP>",
     "username": "<USERNAME>",
     "password": "<PASSWORD>",
-    "mappings": {}
+    "mappings": {},
+    "debug": false
 }
 ```
 
@@ -89,6 +90,25 @@ See the [DoorBell Tutorial](docs/DoorBellTutorial.md) on how to setup the free@h
 
 ## Garage Door
 See the [GarageDoor Tutorial](docs/GarageDoorTutorial.md) on how to expose a Switch actuator as a GarageDoor accessory.
+
+## ContactSensor
+
+The Contact Sensor uses the datapoint `odp0000` by default which might work for you and the Contact Sensor will always be shown as *Closed* in HomeKit. Unfortunately the free@home devices are not consistent and for some Contact Sensors you need to override the used datapoint. So far I've found that either *odp0000* (default) or *odp000C* works, your model might use a different datapoint. You find find the right datapoint by enabling debug mode and opening/closing the Contact Sensor. Look for the datapoint that changes it's value to either *1* or *0* depending on whether you open or close the contact.
+
+```json
+{
+    ....
+    "mappings": {
+        "<ACTUATOR-SERIAL>": { // e.g. ABB123456789
+            "contactsensor": {
+                "<CHANNEL-ID>" { // e.g. ch0001
+                    "datapoint": "<DATAPOINT>" // e.g. odp000C
+                }
+            }
+        }
+    }
+}
+```
 
 # Limitations
 * ~~The door can not be controlled with HomeKit as the bus is not connected to the SysAp.~~
