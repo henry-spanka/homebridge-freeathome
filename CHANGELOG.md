@@ -1,4 +1,9 @@
+### 2.0.5 (2023-01-19)
+
+* add contact sensor datapoint override
+
 ### 2.0.4 (2022-10-09)
+
 * Require at least freeathome-api version 1.1.2 to support newer access point firmwares
 
 ### 2.0.3 (2020-08-19)
