@@ -1,3 +1,9 @@
+# Changelog
+
+### 2.0.7 (2023-07-13)
+
+* Add Horizontal Slats Support for Shutters
+
 ### 2.0.6 (2023-01-19)
 
 * fix crashing on contact sensor datapoint override
@@ -194,9 +200,9 @@ on homebridge start
 * **Configuration:** Allow to ignore some actuators/channels
 * **Performance:** The UI is now more responsive.
 
-# Bug Fixes
+##### Bug Fixes
 * **HomeKit:** Under some circumstances if the API can not authenticate against the SysAp the plugin will report zero accessories and all accessories are removed from the HomeKit database.
 * **API:** If the connection to the API is lost Homebridge crashes.
 
-# Improvements
+##### Improvements
 * **Documentation:** Improved documentation.
